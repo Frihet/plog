@@ -14,7 +14,7 @@
 #
 
 
-import re, cStringIO
+import cStringIO
 import plog.entry, plog.file_parsers
 
 class GlassfishParser(plog.file_parsers.Parser):
@@ -23,10 +23,10 @@ class GlassfishParser(plog.file_parsers.Parser):
     """
 
     # Field number specifications
-    FIELD_DATE=1
-    FIELD_LEVEL=2
-    FIELD_TEXT=4
-    FIELD_TEXT_EXTRA=6
+    FIELD_DATE = 1
+    FIELD_LEVEL = 2
+    FIELD_TEXT = 4
+    FIELD_TEXT_EXTRA = 6
 
     def __init__(self, options):
         """

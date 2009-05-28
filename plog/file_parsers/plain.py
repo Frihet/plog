@@ -13,7 +13,7 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import plog.entry, plog.file_parsers.parsers
+import plog.entry, plog.file_parsers
 
 class PlainParser(plog.file_parsers.Parser):
     """

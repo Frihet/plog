@@ -30,7 +30,7 @@ class TomcatParser(plog.file_parsers.Parser):
         """
         Initialize parser state.
         """
-        file2log.parsers.Parser.__init__(self, options)
+        plog.file_parsers.Parser.__init__(self, options)
 
         # Parser flag, in message parsing
         self.in_message = False
@@ -76,7 +76,7 @@ class TomcatParser(plog.file_parsers.Parser):
 
         # Get level, continue parsing "severe" enough
         level_name = TomcatParser.RE_LINE.search(msg).group(1)
-        level = file2log.entry.get_level(level_name)
+        level = plog.entry.get_level(level_name)
 
         # FIXME: Support parsing the timestamp
         timestamp = None
