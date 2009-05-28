@@ -5,6 +5,9 @@ CREATE TABLE plog_info (
        PRIMARY KEY(name)
 );
 
+-- Set schema version
+INSERT INTO plog_info (name, value) VALUES ('schema_version', '0.1.0');
+
 -- Table holding environment information
 CREATE TABLE environments (
        id INTEGER NOT NULL AUTO_INCREMENT,
@@ -29,13 +32,28 @@ CREATE TABLE hosts (
        PRIMARY KEY(id)
 );
 
+-- Table holding log type matching, id, name, 
+CREATE TABLE log_types (
+       id INTEGER NOT NULL,
+       name VARCHAR(64) NOT NULL,
+       table_name VARCHAR(64),
+       PRIMARY KEY(id)
+);
+
+-- Insert log types
+INSERT INTO log_types (id, name, table_name) VALUES (0, 'plain', NULL);
+INSERT INTO log_types (id, name, table_name) VALUES (1, 'request', 'logs_extra_request');
+INSERT INTO log_types (id, name, table_name) VALUES (2, 'appserver', 'logs_extra_appserver');
+
 -- Table holding single log entries
 CREATE TABLE logs (
        id INTEGER NOT NULL AUTO_INCREMENT,
+       log_time TIMESTAMP NOT NULL DEFAULT NOW(),
        facility INTEGER NOT NULL DEFAULT 0,
        priority INTEGER NOT NULL DEFAULT 0,
        text TEXT,
        extra_text TEXT,
+       log_type INTEGER REFERENCES log_types(id),
        host_id INTEGER REFERENCES hosts(id),
        FULLTEXT (text,extra_text), -- Index log data for searching
        PRIMARY KEY(id)

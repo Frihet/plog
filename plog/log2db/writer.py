@@ -66,11 +66,11 @@ class Writer(threading.Thread):
             try:
                 self._write(event)
             except:
-                # FIXME: Valid exceptions and logging
-                print " ----- WRITE ERROR -----"
                 import traceback
-                traceback.print_exc()
-
+                logging.error('failed to write event %s to database'
+                              % (event, ))
+                logging.info('%s write traceback:\n%s'
+                             % (traceback.format_exc()))
             # Get next event
             event = self._get_event()
 
@@ -132,7 +132,6 @@ class MySQLDBWriter(DBWriter):
         """
         Close database connection after processing.
         """
-        self._conn.close()
         self._conn = None
 
     def _write(self, entry):
@@ -148,6 +147,7 @@ class MySQLDBWriter(DBWriter):
         # Create log entry, write it
         log = plog.orm.Log(
             self._conn,
+            log_type.entry.log_type, log_time=entry.log_time,
             facility=entry.facility, priority=entry.priority,
             text=entry.text, extra_text=entry.extra_text, host_id = host.id)
         log.save()

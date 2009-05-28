@@ -96,13 +96,15 @@ class LogEntry(object):
     Entry base class for log entries received from the network.
     """
 
-    def __init__(self, data, addr, facility, priority):
+    def __init__(self, data, addr, facility, priority,
+                 log_type=plog.LOG_ENTRY_PLAIN):
         """
         Initialize log entry.
         """
-
-        # FIXME: Add time information
-
+        # Type of log entry
+        self.log_type = log_type
+        # Time when event occurred, defaults to local time now
+        self.log_time = None
         # IP address of the source
         self.ip = addr[0]
         # Log facility
@@ -147,7 +149,8 @@ class LogEntryAppserver(LogEntryFile2Log):
         """
         Initialize plain log entry, only sets the event.text
         """
-        LogEntry.__init__(self, data, addr, facility, priority)
+        LogEntry.__init__(self, data, addr, facility, priority,
+                          plog.LOG_ENTRY_APPSERVER)
 
         # Parse log message
         info = data[5:].split(' | ', 3)
@@ -175,7 +178,8 @@ class LogEntryRequest(LogEntryFile2Log):
         """
         Initialize plain log entry, only sets the event.text
         """
-        LogEntry.__init__(self, data, addr, facility, priority)
+        LogEntry.__init__(self, data, addr, facility, priority,
+                          plog.LOG_ENTRY_REQUEST)
 
         # FIXME: Implement LogEntryRequest parsing
         raise NotImplementedError()

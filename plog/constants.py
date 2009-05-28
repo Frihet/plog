@@ -21,14 +21,7 @@ READ_INTERVAL = 0.01
 READ_MAX = 8192
 # Maximum log event size
 READ_LOG_MAX = 32768
-# In config file option for the datbase section
-CFG_SECT_DATABASE = 'database'
-# In config file option for setting file path
-CFG_OPT_PATH = 'path'
-# In config file option for setting parser
-CFG_OPT_PARSER = 'parser'
-# In config file option for setting formatter
-CFG_OPT_FORMATTER = 'formatter'
+
 # Default parser type
 DEFAULT_PARSER = 'plain'
 # Default formatter type
@@ -39,3 +32,31 @@ DEFAULT_FACILITY = 3
 DEFAULT_PRIORITY = 4
 # Default path to configuration file
 PATH_CONFIG = 'plog.cfg'
+
+# In config file option for the logging section
+CFG_SECT_LOGGING = 'logging'
+# In config file option for the database section
+CFG_SECT_DATABASE = 'database'
+# In config file option for setting file path
+CFG_OPT_PATH = 'path'
+# In config file option for pid file directory
+CFG_OPT_PID_PATH = '/var/run'
+# In config file option for setting parser
+CFG_OPT_PARSER = 'parser'
+# In config file option for setting formatter
+CFG_OPT_FORMATTER = 'formatter'
+# In config file option for setting log level
+CFG_OPT_LOG_LEVEL = 'log_level'
+# Default value for log level option
+CFG_OPT_LOG_LEVEL_DEFAULT = 'WARNING'
+# In config file option for setting log path
+CFG_OPT_LOG_PATH = 'path'
+# Default value for log path option
+CFG_OPT_LOG_PATH_DEFAULT = '/var/log/plog'
+# In config file option for daemonizing
+CFG_OPT_DAEMONIZE = 'daemonize'
+
+# Log types, these types need to reflect correct values in the database
+LOG_ENTRY_PLAIN = 0
+LOG_ENTRY_REQUEST = 1
+LOG_ENTRY_APPSERVER = 2
