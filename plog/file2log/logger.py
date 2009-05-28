@@ -40,10 +40,20 @@ class Logger(object):
         for f_entry in f_entries:
             self._log_until_size_ok(f_entry)
 
-    def _log_until_size_ok(self, entry):
+    def _log_until_size_ok(self, f_entry):
         """
+        Write formatted entry to syslog, re-try until message fits
+        allowed size.
         """
-        
-
-        self.syslog.log(f_entry.text, facility=f_entry.facility,
-                        priority=f_entry.priority)
+        not_sent = True
+        text = f_entry.text
+        while not_sent and len(text) > 1:
+            try:
+                self.syslog.log(text, facility=f_entry.facility,
+                                priority=f_entry.priority)
+                not_sent = False
+            except socket.error, exc:
+                if exc.errno == errno.EMSGSIZE:
+                    text = text[:len(text) / 2]
+                else:
+                    raise

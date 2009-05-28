@@ -13,8 +13,6 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import types
-
 # Set to true when database information has been extracted
 DB_INITIALIZED = False
 
@@ -176,10 +174,10 @@ class Environment(DBObject):
 
     @classmethod
     def get_table_name(cls):
-       """
-       Get name of the table.
-       """
-       return 'environments'
+        """
+        Get name of the table.
+        """
+        return 'environments'
 
 class Host(DBObject):
     """
@@ -188,10 +186,10 @@ class Host(DBObject):
 
     @classmethod
     def get_table_name(cls):
-       """
-       Get name of the table.
-       """
-       return 'hosts'
+        """
+        Get name of the table.
+        """
+        return 'hosts'
 
 class HostType(DBObject):
     """
@@ -200,10 +198,10 @@ class HostType(DBObject):
 
     @classmethod
     def get_table_name(cls):
-       """
-       Get name of the table.
-       """
-       return 'host_types'
+        """
+        Get name of the table.
+        """
+        return 'host_types'
 
 class Log(DBObject):
     """
@@ -213,28 +211,28 @@ class Log(DBObject):
 
     @classmethod
     def get_table_name(cls):
-       """
-       Get name of the table.
-       """
-       return 'logs'
+        """
+        Get name of the table.
+        """
+        return 'logs'
 
 class LogExtraAppserver(DBObject):
 
     @classmethod
     def get_table_name(cls):
-       """
-       Get name of the table.
-       """
-       return 'logs_extra_appserver'
+        """
+        Get name of the table.
+        """
+        return 'logs_extra_appserver'
 
 class LogExtraRequest(DBObject):
 
     @classmethod
     def get_table_name(cls):
-       """
-       Get name of the table.
-       """
-       return 'logs_extra_request'
+        """
+        Get name of the table.
+        """
+        return 'logs_extra_request'
 
 class DBConnection(object):
     """
