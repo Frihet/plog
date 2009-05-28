@@ -22,6 +22,12 @@ class File2LogDaemon(plog.daemon.Daemon):
     input, parses and sends parsed logs to the logger.
     """
 
+    def __init__(self):
+        """
+        Initialize File2LogDaemon
+        """
+        plog.daemon.Daemon.__init__(self, 'file2log')
+
     def _daemon_main(self):
         """
         Main routine for the reader, runs a select loop waiting for
@@ -35,7 +41,7 @@ class File2LogDaemon(plog.daemon.Daemon):
         buf = cStringIO.StringIO()
         poller = self._initialize_read(self._files)
 
-        while True:
+        while self._do_run():
             # Iterate over files looking for changes, not using poll
             # here as files can change name and thus following path
             # names will not work using the stat approach.

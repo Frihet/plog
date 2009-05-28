@@ -50,6 +50,15 @@ class Writer(threading.Thread):
         self._event_queue_cond.notify()
         self._event_queue_cond.release()
 
+    def stop(self):
+        """
+        Signal the writer to shut down.
+        """
+        self._event_queue_cond.acquire()
+        self._event_queue = [None]
+        self._event_queue_cond.notify()
+        self._event_queue_cond.release()
+
     def run(self):
         """
         Writer main routine, waits for events and _writes them. Exits

@@ -13,7 +13,8 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import plog, plog.application
+import os, logging
+import plog, plog.application, plog.util
 
 class Daemon(plog.application.Application):
     """
@@ -25,12 +26,8 @@ class Daemon(plog.application.Application):
         Daemonize if requested in the parameters and then run
         _daemon_main.
         """
-        if False:
-            # FIXME: Implement daemoninzation
-            pass
-
-        # FIXME: Implement child respawn
-
+        if self._do_daemonize():
+            self._daemonize()
         self._daemon_main()
 
     def _daemon_main(self):
@@ -38,3 +35,47 @@ class Daemon(plog.application.Application):
         Daemon main routine, implemented by subclasses.
         """
         raise NotImplementedError()
+
+    def _daemonize(self):
+        """
+        Daemonize application, writing file with pid if requested.
+        """
+        try:
+            pid = os.fork()
+        except OSError, exc:
+            raise Exception('failed to fork: %s' % (exc.strerror, ))
+
+        if pid == 0:
+            # Initial child, set session id.
+            os.setsid()
+
+            try:
+                pid = os.fork()
+            except OSError, exc:
+                raise Exception('failed to fork: %s' % (exc.strerror, ))
+            
+            if pid == 0:
+                # Second child, change work directory to avoid issues
+                # locking file mounts.
+                os.chdir('/')
+            else:
+                # First child, exit
+                os._exit(0)
+
+        else:
+            # Original process, exit with _exit to avoid exit handlers
+            # to be run and file descriptors to be flushed.
+            os._exit(0)
+
+        # Write pid file if requested
+        pid_path = self._config.get(self._name, plog.CFG_OPT_PID_PATH, None)
+        if pid_path is not None:
+            pid_file = os.path.join(pid_path, '%s.pid' % (self._name, ))
+            if not plog.util.write_file(pid_file, str(os.getpid())):
+                logging.error('failed to write pid to %s' % (pid_file, ))
+            
+    def _do_daemonize(self):
+        """
+        Return true if the daemon should fork off to the background.
+        """      
+        return self._config.get_bool(self._name, plog.CFG_OPT_DAEMONIZE, '1')

@@ -13,7 +13,7 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import ConfigParser
+import logging, ConfigParser
 import plog
 
 class PlogConfigParser(ConfigParser.SafeConfigParser):
@@ -60,12 +60,53 @@ class Config(object):
         self.cfg = PlogConfigParser()
         self.cfg.read(self.path)
 
-    def get(self, section, value, default=None):
+    def get(self, section, key, default=None):
         """
         Get configuration value, return default value if value or
         section does not exist.
         """
-        return self.cfg.get(section, value, default)
+        try:
+            value = self.cfg.get(section, key)
+        except ConfigParser.NoOptionError:
+            value = default
+        return value
+
+    def get_bool(self, section, key, default):
+        """
+        Get boolean value from configuration file.
+        """
+        value = self.get(section, key, default).lower()
+        try:
+            value = self._to_bool(value)
+        except ValueError:
+            logging.warning('invalid boolean in configuration %s.%s, setting default %s'
+                            % (section, key, default))
+            value = self._to_bool(value)
+
+    def _to_bool(self, value):
+        """
+        Get boolean from string, raise Value
+        """
+        if value in ('1', 'yes', 'true'):
+            value = True
+        elif value in ('0', 'no', 'false'):
+            value = False
+        else:
+            raise ValueError('invalid boolean value %s' % (value, ))
+
+    def get_int(self, section, key, default):
+        """
+        Get integer value from configuration file.
+        """
+        value = self.get(section, key, default)
+        try:
+            value = int(value)
+        except ValueError:
+            logging.warning('invalid integer in configuration %s.%s, setting default %s'
+                            % (section, key, default))
+            value = int(default)
+        return value
+        
 
     def get_db_config(self):
         """
@@ -73,8 +114,11 @@ class Config(object):
         """
         db_config = self.cfg.get_options(plog.CFG_SECT_DATABASE)
         if 'port' in db_config:
-            # FIXME: How to check for port in a sane fashion
-            db_config['port'] = int(db_config['port'])
+            try:
+                db_config['port'] = int(db_config['port'])
+            except ValueError:
+                # FIXME: Send out "feedback" exception
+                pass
 
         return db_config
 

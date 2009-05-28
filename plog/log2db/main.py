@@ -38,7 +38,7 @@ class Log2DbDaemon(plog.daemon.Daemon):
         """
         Initialize Log2DbDaemon.
         """
-        plog.daemon.Daemon.__init__(self)
+        plog.daemon.Daemon.__init__(self, 'log2db')
 
         # Network socket
         self._socket = None
