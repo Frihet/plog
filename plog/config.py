@@ -25,8 +25,12 @@ class PlogConfigParser(ConfigParser.SafeConfigParser):
         """
         Build dictionary from values in section.
         """
-        return dict([(option, self.get(section, option))
-                     for option in self.options(section)])
+        try:
+            options = dict([(option, self.get(section, option))
+                            for option in self.options(section)])
+        except ConfigParser.NoSectionError:
+            options = {}
+        return options
 
     def get_options_with_prefix(self, section, prefix):
         """
@@ -67,6 +71,8 @@ class Config(object):
         """
         try:
             value = self.cfg.get(section, key)
+        except ConfigParser.NoSectionError:
+            value = default
         except ConfigParser.NoOptionError:
             value = default
         return value

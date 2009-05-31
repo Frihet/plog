@@ -13,6 +13,9 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Current version of plog
+VERSION = '0.1.0'
+
 # Exit value returned when printing usage information.
 EXIT_USAGE = 1
 # Time in seconds to sleep between stat sweeps in the reader
