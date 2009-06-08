@@ -40,7 +40,8 @@ class PlainFormatter(plog.formatters.Formatter):
                 self.transform_str, self.transform_re = value.split('|', 1)
                 self.transform_re = re.compile(self.transform_re)
             else:
-                raise ValueError('unsupported option "%s" to PlainFormatter. Supported options are transform.')
+                raise ValueError('unsupported option "%s" to PlainFormatter. Supported options are transform.'
+                                 % (option, ))
 
     def format(self, f_obj, entry):
         """

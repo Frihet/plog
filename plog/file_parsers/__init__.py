@@ -55,7 +55,7 @@ class Parser(object):
         # successfully parsed at.
         for line in self.buf:
             entry = self.parse_line(line)
-            if entry:
+            if entry is not None:
                 entries.append(entry)
 
         # Truncate buffer.

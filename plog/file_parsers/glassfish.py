@@ -13,7 +13,6 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 import cStringIO
 import plog.entry, plog.file_parsers
 

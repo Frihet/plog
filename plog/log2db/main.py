@@ -110,8 +110,8 @@ class Log2DbDaemon(plog.daemon.Daemon):
         # Decode priority
         try:
             facility_priority = int(data[1:log_start])
-            facility = 1
-            priority = 1
+            facility = (facility_priority & 0xf8) >> 3
+            priority = facility_priority & 0x07
         except ValueError:
             return None
 

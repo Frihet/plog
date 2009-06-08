@@ -23,8 +23,7 @@ def main():
     Main routine, just loads and starts file2log main routine.
     """
     import plog.file2log.main
-
     plog.file2log.main.main()
 
 if __name__ == '__main__':
-   main()
+    main()

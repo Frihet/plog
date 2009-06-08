@@ -133,11 +133,23 @@ class Application(object):
         os.seteuid(user_info.pw_uid)
         os.setegid(group_info.gr_gid)
 
+    def stop(self):
+        """
+        Request the application to shut down.
+        """
+        self._flag_run = False
+
     def _do_run(self):
         """
         Check if application should continue to run.
         """
         return self._flag_run
+
+    def reload(self):
+        """
+        Request the application to reload it's configuration
+        """
+        self._flag_reload = True
 
     def _do_reload(self):
         """
