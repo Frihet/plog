@@ -61,7 +61,7 @@ class Entry(object):
 
     def __init__(self, msg, msg_extra=None, timestamp=None,
                  facility = plog.DEFAULT_FACILITY, level=LEVEL_NONE,
-                 extra_values = None):
+                 extra_values = None, addr = None):
         """
         Initialize entry, fill in timestamp if not specified.
         """
@@ -82,6 +82,9 @@ class Entry(object):
         # IP address of log source
         self.ip_addr = None
 
+        if addr is not None:
+            self.ip_addr = addr[0]
+
 
     @classmethod
     def get_log_type(cls):
@@ -95,7 +98,7 @@ class Entry(object):
         """
         Return list of extra fields, implemented by sub-classes.
         """
-        return []
+        return ()
 
     @classmethod
     def get_signature(cls):
@@ -145,7 +148,6 @@ class Entry(object):
         """
         Decode message delivered from syslog.
         """
-        pass
 
 class PlogEntry(Entry):
     """
@@ -158,11 +160,11 @@ class PlogEntry(Entry):
         Parse plog style log message.
         """
         extra_fields = self.get_extra_fields()
-        num_fields = 6 + len(extra_fields)
+        num_fields = 5 + len(extra_fields)
 
         # Parse log message
         info = self.msg[5:].split('|', num_fields)
-        if len(info) < num_fields:
+        if  num_fields > len(info):
             # FIXME: Handle invalid message
             return False
 
@@ -173,7 +175,12 @@ class PlogEntry(Entry):
         self.timestamp = self._get_timestamp_from_str(info[3])
 
         # Log type specific values
-        self.extra_values = num_fields[4:-2]
+        self.extra_values = []
+        for pos in xrange(len(extra_fields)):
+            field_name, field_type = extra_fields[pos]
+            self.extra_values.append(field_type(info[pos+3]))
+
+        return True
 
 class RequestEntry(PlogEntry):
     """
@@ -195,8 +202,9 @@ class RequestEntry(PlogEntry):
         """
         Return list of extra fields used by request type.
         """
-        return ('re_ip', 're_method', 're_user_agent', 're_size',
-                're_status', 're_ms_time', 're_uri')
+        return (('re_ip', str), ('re_method', str), ('re_user_agent', str),
+                ('re_size', int), ('re_status', int), ('re_ms_time', int),
+                ('re_uri', str))
 
     @classmethod
     def get_signature(cls):
@@ -232,5 +240,5 @@ class AppserverEntry(PlogEntry):
         """
         Return list of extra fields used by request type.
         """
-        return ('as_name', 'as_level')
+        return (('as_name', str), ('as_level', str))
 

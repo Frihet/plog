@@ -216,24 +216,6 @@ class Log(DBObject):
         """
         return 'logs'
 
-class LogExtraAppserver(DBObject):
-
-    @classmethod
-    def get_table_name(cls):
-        """
-        Get name of the table.
-        """
-        return 'logs_extra_appserver'
-
-class LogExtraRequest(DBObject):
-
-    @classmethod
-    def get_table_name(cls):
-        """
-        Get name of the table.
-        """
-        return 'logs_extra_request'
-
 class DBConnection(object):
     """
     Base class for database connections.

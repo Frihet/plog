@@ -23,9 +23,9 @@ import plog, plog.daemon, plog.entry, plog.log2db.writer
 
 # Rules identifying log message
 CLASSIFY_RULES = (
-    (re.compile('^!!AS '), plog.entry.LogEntryAppserver),
-    (re.compile('^!!RQ '), plog.entry.LogEntryRequest),
-    (re.compile('^.'), plog.entry.LogEntryPlain)
+    (re.compile('^!!AS '), plog.entry.AppserverEntry),
+    (re.compile('^!!RQ '), plog.entry.RequestEntry),
+    (re.compile('^.'), plog.entry.Entry)
     )
 
 class Log2DbDaemon(plog.daemon.Daemon):
@@ -43,7 +43,7 @@ class Log2DbDaemon(plog.daemon.Daemon):
         # Network socket
         self._socket = None
         # Writer thread
-        self._db_writer = None
+        self._writer = None
 
     def _daemon_main(self):
         """
@@ -55,7 +55,7 @@ class Log2DbDaemon(plog.daemon.Daemon):
         address = self._config.get('log2db', 'bind_address', '0.0.0.0')
         port = int(self._config.get('log2db', 'bind_port', '514'))
 
-	self._socket.bind((address, port))
+        self._socket.bind((address, port))
 
         # FIXME: Support other database writer types
 
@@ -91,9 +91,11 @@ class Log2DbDaemon(plog.daemon.Daemon):
         """
         message =  self._decode_syslog(data)
         if message is not None:
-            facility, priority, data = message
-            event_class = self._classify_event(data, addr)
-            return event_class(data, addr, facility, priority)
+            facility, priority, msg = message
+            event_class = self._classify_event(msg, addr)
+            event = event_class(msg, None, None, facility, priority, None, addr)
+            event.from_syslog()
+            return event
 
     def _decode_syslog(self, data):
         """
@@ -116,11 +118,11 @@ class Log2DbDaemon(plog.daemon.Daemon):
             return None
 
         if data[-1] == '\000':
-            data = data[log_start+1:-1]
+            msg = data[log_start+1:-1]
         else:
-            data = data[log_start+1:]
+            msg = data[log_start+1:]
 
-        return (facility, priority, data)
+        return (facility, priority, msg)
 
     def _classify_event(self, data, addr):
         """
@@ -130,7 +132,7 @@ class Log2DbDaemon(plog.daemon.Daemon):
         for rule, event_class in CLASSIFY_RULES:
             if rule.match(data):
                 return event_class
-        return plog.entry.LogEntryPlain
+        return plog.entry.Entry
 
 def main():
     """

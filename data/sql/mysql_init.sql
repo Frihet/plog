@@ -51,19 +51,19 @@ CREATE TABLE logs (
        log_time TIMESTAMP NOT NULL DEFAULT NOW(),
        facility INTEGER NOT NULL DEFAULT 0,
        priority INTEGER NOT NULL DEFAULT 0,
-       text TEXT,
-       extra_text TEXT,
+       msg TEXT,
+       msg_extra TEXT,
        log_type INTEGER REFERENCES log_types(id),
        host_id INTEGER REFERENCES hosts(id),
-       re_ip VARCHAR(15) NOT NULL, -- Columns used by request entries
-       re_method VARCHAR(16) NOT NULL,
+       re_ip VARCHAR(15), -- Columns used by request entries
+       re_method VARCHAR(16),
        re_user_agent VARCHAR(255),
-       re_size INTEGER NOT NULL DEFAULT 0,
-       re_status INTEGER NOT NULL,
-       re_ms_time INTEGER NOT NULL DEFAULT 0,
-       re_uri VARCHAR(255) NOT NULL,
-       as_name VARCHAR(64) NOT NULL, -- Columns used by appserver entries
-       as_level VARCHAR(16) NOT NULL, -- FIXME: Set to integer value
-       FULLTEXT (text,extra_text), -- Index log data for searching
+       re_size INTEGER DEFAULT 0,
+       re_status INTEGER ,
+       re_ms_time INTEGER DEFAULT 0,
+       re_uri VARCHAR(255),
+       as_name VARCHAR(64), -- Columns used by appserver entries
+       as_level VARCHAR(16), -- FIXME: Set to integer value
+       FULLTEXT (msg,msg_extra), -- Index log data for searching
        PRIMARY KEY(id)
 );

@@ -148,21 +148,25 @@ class MySQLDBWriter(DBWriter):
         Write message to database.
         """
         # FIXME: Add host cache
-        host = plog.orm.Host(self._conn, ip=entry.ip)
+        host = plog.orm.Host(self._conn, ip=entry.ip_addr)
         if host.id is None:
-            host.name = entry.ip
+            host.name = entry.ip_addr
             host.save()
 
-        # Create log entry, write it
-        log = plog.orm.Log(
-            self._conn,
-            log_type=entry.log_type, log_time=entry.log_time,
-            facility=entry.facility, priority=entry.priority,
-            text=entry.text, extra_text=entry.extra_text, host_id = host.id)
-        log.save()
+        # Main log data
+        log_data = {
+            'log_type': entry.log_type, 'log_time': entry._get_timestamp_str(),
+            'facility': entry.facility, 'priority': entry.level,
+            'msg': entry.msg, 'msg_extra': entry.msg_extra,
+            'host_id': host.id
+            }
 
-        # Write extra log data if requested
-        if entry.extra_class is not None:
-            log_extra = entry.extra_class(
-                self._conn, log_id=log.id, **entry.extra_params)
-            log_extra.save()
+        # Add extra data to log entry
+        if entry.extra_values:
+            extra_fields = entry.get_extra_fields()
+            for pos in xrange(len(extra_fields)):
+                log_data[extra_fields[pos][0]] = entry.extra_values[pos]
+
+        # Create log entry, write it
+        log = plog.orm.Log(self._conn, **log_data)
+        log.save()
