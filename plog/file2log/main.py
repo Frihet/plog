@@ -13,7 +13,11 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys, time, cStringIO
+"""
+file2log main routine.
+"""
+
+import cStringIO
 import plog, plog.config, plog.daemon, plog.file2log.logger
 
 class File2LogDaemon(plog.daemon.Daemon):

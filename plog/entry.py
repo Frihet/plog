@@ -13,6 +13,10 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Log data abstraction, encoding and decoding.
+"""
+
 import time
 import plog, plog.file2log.syslog
 
@@ -49,138 +53,184 @@ def get_level_str(level):
     """
     return LEVEL_TO_NAME.get(level, 'UNKNOWN')
 
-class FileEntry(object):
+class Entry(object):
     """
-    Common file entry format shared between all parsers allowing the
-    formatting rules to apply.
+    Common entry format shared between all parsers to allow easy
+    conversion and the use of common formatting rules.
     """
 
-    def __init__(self, text, text_extra=None, timestamp=None, level=LEVEL_NONE):
+    def __init__(self, msg, msg_extra=None, timestamp=None,
+                 facility = plog.DEFAULT_FACILITY, level=LEVEL_NONE,
+                 extra_values = None):
         """
         Initialize entry, fill in timestamp if not specified.
         """
-        # Entry text, for plain text files this is everything.
-        self.text = text
-        # Extra text, can be an exception in application server files.
-        self.text_extra = text_extra
+        # Type of entry
+        self.log_type = plog.LOG_ENTRY_PLAIN
+        # Entry message, log message from syslog / file.
+        self.msg = msg
+        # Extra message, can be exception from log server etc.
+        self.msg_extra = msg_extra
         # Timestamp of entry
         self.timestamp = timestamp
-        # Level of entry, can be WARNING etc for format filters.
+        # Log facility
+        self.facility = plog.DEFAULT_FACILITY
+        # Level (priority) of entry, can be WARNING etc for format filters.
         self.level = level
+        # List of extra values used by a specific log type
+        self.extra_values = extra_values
+        # IP address of log source
+        self.ip_addr = None
 
-        # Fill
+
+    @classmethod
+    def get_log_type(cls):
+        """     
+        Return log type.
+        """
+        return 'plain'
+
+    @classmethod
+    def get_extra_fields(cls):
+        """
+        Return list of extra fields, implemented by sub-classes.
+        """
+        return []
+
+    @classmethod
+    def get_signature(cls):
+        """
+        Return log signature, for plain entries this is nothing.
+        """
+        return ''
+
+    def _get_timestamp_str(self):
+        """
+        Format self.timestamp to string for sending over the network,
+        sets timestamp to now if not set.
+        """
         if self.timestamp is None:
             self.timestamp = time.localtime()
+        return time.strftime(plog.LOG_TIME_FORMAT, self.timestamp)
 
-class FormattedEntry(object):
-    """
-    Formatted file entry including destination information such as
-    facility.
-    """
-
-    def __init__(self, text,
-                 priority=plog.DEFAULT_PRIORITY,
-                 facility=plog.DEFAULT_FACILITY):
+    def _get_timestamp_from_str(self, timestamp_str):
         """
-        Initialize formatted entry.
+        Get timestamp from string, defaulting to now if parsing fails.
         """
-        # Text of formatted entry
-        self.text = text
-        # Priority to send formatted entry as.
-        self.priority = priority
-        # Facility to send formatted entry to.
-        self.facility = facility
+        try:
+            timestamp = time.strptime(timestamp_str, plog.LOG_TIME_FORMAT)
+        except ValueError:
+            timestamp = time.localtime()
+        return timestamp
 
-class LogEntry(object):
-    """
-    Entry base class for log entries received from the network.
-    """
-
-    def __init__(self, data, addr, facility, priority,
-                 log_type=plog.LOG_ENTRY_PLAIN):
+    def _format_syslog(self, name, extra_values):
         """
-        Initialize log entry.
+        Formats message for syslog, no special tricks here.
         """
-        # Type of log entry
-        self.log_type = log_type
-        # Time when event occurred, defaults to local time now
-        self.log_time = None
-        # IP address of the source
-        self.ip = addr[0]
-        # Log facility
-        self.facility = facility
-        # Log priority
-        self.priority = priority
-        # Event text, available in the base log table
-        self.text = None
-        # Event extra text, available in the base log table
-        self.extra_text = None
-        
-        # Name of the log extra class
-        self.extra_class = None
-        # Parameters when constructing the log extra class
-        self.extra_params = None
+        return '%s%s|%s|%s|%s|%s|%s' % (
+            self.get_signature(), name,
+            self._get_timestamp_str(), get_level_str(self.level),
+            extra_values, self.msg, self.msg_extra)
 
-class LogEntryPlain(LogEntry):
-    """
-    Plain log entries received from the network.
-    """
-
-    def __init__(self, data, addr, facility, priority):
+    def to_syslog(self, name):
         """
-        Initialize plain log entry, only sets the event.text
+        Encode message for output on syslog including extra
+        fields. For complex log data this should be overridden by
+        sub-classes.
         """
-        LogEntry.__init__(self, data, addr, facility, priority)
+        extra_values = '|'.join([str(value) for value in self.extra_values])
+        return self._format_syslog(name, extra_values)
 
-        # Set the complete log message as the text
-        self.text = data
-
-class LogEntryFile2Log(LogEntry):
-    """
-    Base class for all file2log based log events.
-    """
-
-class LogEntryAppserver(LogEntryFile2Log):
-    """
-    Application server log entries, identified by !!AS
-    """
-
-    def __init__(self, data, addr, facility, priority):
+    def from_syslog(self):
         """
-        Initialize plain log entry, only sets the event.text
+        Decode message delivered from syslog.
         """
-        LogEntry.__init__(self, data, addr, facility, priority,
-                          plog.LOG_ENTRY_APPSERVER)
+        pass
+
+class PlogEntry(Entry):
+    """
+    Base class for plog based messages, adds decoding of plog
+    to_syslog messages.
+    """
+
+    def from_syslog(self):
+        """
+        Parse plog style log message.
+        """
+        extra_fields = self.get_extra_fields()
+        num_fields = 6 + len(extra_fields)
 
         # Parse log message
-        info = data[5:].split(' | ', 3)
-        if len(info) < 3:
+        info = self.msg[5:].split('|', num_fields)
+        if len(info) < num_fields:
             # FIXME: Handle invalid message
-            pass
-        elif len(info) == 3:
-            info.append(None)
+            return False
 
         # Base log data
-        self.text = info[2]
-        self.extra_text = info[3]
+        self.log_type = self.get_log_type()
+        self.msg = info[num_fields - 2]
+        self.msg_extra = info[num_fields - 1]
+        self.timestamp = self._get_timestamp_from_str(info[3])
 
-        # Appserver specific data
-        self.extra_class = plog.orm.LogExtraAppserver
-        # FIXME: Convert as_level into integer value
-        self.extra_params = {'as_name': info[0], 'as_level': info[1]}
+        # Log type specific values
+        self.extra_values = num_fields[4:-2]
 
-class LogEntryRequest(LogEntryFile2Log):
+class RequestEntry(PlogEntry):
     """
-    Request log entries, identified by !!RQ
+    Request log entry adds extra fields for request status and client
+    information.
+
+    Identified by !!RQ signature.
     """
 
-    def __init__(self, data, addr, facility, priority):
+    @classmethod
+    def get_log_type(cls):
+        """     
+        Return log type.
         """
-        Initialize plain log entry, only sets the event.text
-        """
-        LogEntry.__init__(self, data, addr, facility, priority,
-                          plog.LOG_ENTRY_REQUEST)
+        return 'request'
 
-        # FIXME: Implement LogEntryRequest parsing
-        raise NotImplementedError()
+    @classmethod
+    def get_extra_fields(cls):
+        """
+        Return list of extra fields used by request type.
+        """
+        return ('re_ip', 're_method', 're_user_agent', 're_size',
+                're_status', 're_ms_time', 're_uri')
+
+    @classmethod
+    def get_signature(cls):
+        """
+        Return log signature.
+        """
+        return '!!RQ '
+
+class AppserverEntry(PlogEntry):
+    """
+    Application log entry adds extra fields for traceback and request
+    level.
+
+    Identified by !!AS signature.
+    """
+
+    @classmethod
+    def get_log_type(cls):
+        """     
+        Return log type.
+        """
+        return 'appserver'
+
+    @classmethod
+    def get_signature(cls):
+        """
+        Return log signature.
+        """
+        return '!!AS '
+
+    @classmethod
+    def get_extra_fields(cls):
+        """
+        Return list of extra fields used by request type.
+        """
+        return ('as_name', 'as_level')
 

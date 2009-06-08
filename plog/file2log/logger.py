@@ -33,27 +33,27 @@ class Logger(object):
         else:
             self.syslog = plog.file2log.syslog.syslog_client((host, port))
 
-    def log(self, f_entries):
+    def log(self, name, entries):
         """
         Write formatted entry to syslog.
         """
-        for f_entry in f_entries:
-            self._log_until_size_ok(f_entry)
+        for entry in entries:
+            msg = entry.to_syslog(name)
+            print entry.facility, entry.level, msg
+            # self._log_until_size_ok(entry.facility, entry.level, msg)
 
-    def _log_until_size_ok(self, f_entry):
+    def _log_until_size_ok(self, facility, priority, msg):
         """
         Write formatted entry to syslog, re-try until message fits
         allowed size.
         """
         not_sent = True
-        text = f_entry.text
-        while not_sent and len(text) > 1:
+        while not_sent and len(msg) > 1:
             try:
-                self.syslog.log(text, facility=f_entry.facility,
-                                priority=f_entry.priority)
+                self.syslog.log(msg, facility=facility, priority=priority)
                 not_sent = False
             except socket.error, exc:
                 if exc.errno == errno.EMSGSIZE:
-                    text = text[:len(text) / 2]
+                    msg = msg[:len(msg) / 2]
                 else:
                     raise
