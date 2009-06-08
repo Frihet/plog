@@ -55,22 +55,15 @@ CREATE TABLE logs (
        extra_text TEXT,
        log_type INTEGER REFERENCES log_types(id),
        host_id INTEGER REFERENCES hosts(id),
+       re_ip VARCHAR(15) NOT NULL, -- Columns used by request entries
+       re_method VARCHAR(16) NOT NULL,
+       re_user_agent VARCHAR(255),
+       re_size INTEGER NOT NULL DEFAULT 0,
+       re_status INTEGER NOT NULL,
+       re_ms_time INTEGER NOT NULL DEFAULT 0,
+       re_uri VARCHAR(255) NOT NULL,
+       as_name VARCHAR(64) NOT NULL, -- Columns used by appserver entries
+       as_level VARCHAR(16) NOT NULL, -- FIXME: Set to integer value
        FULLTEXT (text,extra_text), -- Index log data for searching
        PRIMARY KEY(id)
-);
-
--- Special log type tables
-
--- Request logs such as Apache
-CREATE TABLE logs_extra_request (
-       log_id INTEGER NOT NULL REFERENCES logs(id),
-       PRIMARY KEY(log_id)
-);
-
--- Application server logs such as Tomcat and Glassfish
-CREATE TABLE logs_extra_appserver (
-       log_id INTEGER NOT NULL REFERENCES logs(id),
-       as_name VARCHAR(64) NOT NULL,
-       as_level VARCHAR(16) NOT NULL, -- FIXME: Set to integer value
-       PRIMARY KEY(log_id)
 );
