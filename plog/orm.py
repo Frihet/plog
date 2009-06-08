@@ -285,6 +285,26 @@ class DBConnection(object):
 
         return row
 
+    def fetch_all(self, query, query_params):
+        """
+        Convenience functionality to fetch all results for a
+        query. Grabs cursor, executes and returns a list of rows.
+        """
+        curs = self.get_cursor()
+        if query_params:
+            res = curs.execute(query, query_params)
+        else:
+            res = curs.execute(query)
+
+        rows = []
+        row = curs.fetchone()
+        while row:
+            rows.append(row)
+            row = curs.fetchone()
+        curs.close()
+
+        return rows
+
 class MySQLDBConnection(DBConnection):
     """
     MySQL database connection.
