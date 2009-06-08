@@ -65,8 +65,6 @@ class Entry(object):
         """
         Initialize entry, fill in timestamp if not specified.
         """
-        # Type of entry
-        self.log_type = plog.LOG_ENTRY_PLAIN
         # Entry message, log message from syslog / file.
         self.msg = msg
         # Extra message, can be exception from log server etc.
@@ -85,13 +83,12 @@ class Entry(object):
         if addr is not None:
             self.ip_addr = addr[0]
 
-
     @classmethod
     def get_log_type(cls):
         """     
         Return log type.
         """
-        return 'plain'
+        return plog.LOG_ENTRY_PLAIN
 
     @classmethod
     def get_extra_fields(cls):
@@ -169,10 +166,9 @@ class PlogEntry(Entry):
             return False
 
         # Base log data
-        self.log_type = self.get_log_type()
         self.msg = info[num_fields - 2]
         self.msg_extra = info[num_fields - 1]
-        self.timestamp = self._get_timestamp_from_str(info[3])
+        self.timestamp = self._get_timestamp_from_str(info[1])
 
         # Log type specific values
         self.extra_values = []
@@ -195,7 +191,7 @@ class RequestEntry(PlogEntry):
         """     
         Return log type.
         """
-        return 'request'
+        return plog.LOG_ENTRY_REQUEST
 
     @classmethod
     def get_extra_fields(cls):
@@ -226,7 +222,7 @@ class AppserverEntry(PlogEntry):
         """     
         Return log type.
         """
-        return 'appserver'
+        return plog.LOG_ENTRY_APPSERVER
 
     @classmethod
     def get_signature(cls):

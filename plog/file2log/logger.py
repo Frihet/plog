@@ -39,8 +39,7 @@ class Logger(object):
         """
         for entry in entries:
             msg = entry.to_syslog(name)
-            print entry.facility, entry.level, msg
-            # self._log_until_size_ok(entry.facility, entry.level, msg)
+            self._log_until_size_ok(entry.facility, entry.level, msg)
 
     def _log_until_size_ok(self, facility, priority, msg):
         """
