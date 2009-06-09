@@ -1,0 +1,40 @@
+/*
+ * Base styling, body, link tags etc.
+ */
+body {
+  font-familiy: sans-serif;
+  color: #000;
+  background-color: #fff;
+}
+
+/*
+ * Element styling specific to plog
+ */
+form.search_form {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 0.5em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+#logs table {
+  border: 1px solid #ccc;
+}
+
+#logs table th {
+  background-color: #eee;
+}
+
+.log_detail {
+  color: #333;
+  font-size: small;
+}
+
+.log_warning {
+  background-color: #ffa;
+}
+
+.log_error {
+  background-color: #fee;
+}
