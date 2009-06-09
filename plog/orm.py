@@ -63,7 +63,8 @@ class DBObject(object):
         for column in self.get_column_names():
             setattr(self, column, None)
 
-    def _get_conditions(self, conditions):
+    @classmethod
+    def _get_conditions(cls, conditions):
         """
         Get SQL conditions from dictionary.
         """
@@ -79,8 +80,11 @@ class DBObject(object):
         """
         # Build find query
         conditions_sql, conditions_params = self._get_conditions(conditions)
-        query = """SELECT * FROM %s WHERE %s""" % (
-            self.get_table_name(), conditions_sql)
+        if conditions_sql:
+            query = """SELECT * FROM %s WHERE %s""" % (
+                self.get_table_name(), conditions_sql)
+        else:
+            query = """SELECT * FROM %s WHERE %s""" % (self.get_table_name(), )
 
         # Fetch results and set
         row = self._conn.fetch_one(query, conditions_params)
@@ -89,6 +93,28 @@ class DBObject(object):
                 setattr(self, column, value)
 
         return row is not None
+
+    @classmethod
+    def find_all(cls, conn, conditions):
+        """
+        Find all DBObjects matching condition returning a list.
+        """
+        objects = []
+
+        # Build find query
+        conditions_sql, conditions_params = cls._get_conditions(conditions)
+        if conditions_sql:
+            query = """SELECT * FROM %s WHERE %s""" % (
+                cls.get_table_name(), conditions_sql)
+        else:
+            query = """SELECT * FROM %s""" % (cls.get_table_name(), )
+
+        # Fetch results and set
+        rows = conn.fetch_all(query, conditions_params)
+        for row in rows:
+            objects.append(cls(conn, **dict(row.iteritems())))
+
+        return objects
 
     def save(self):
         """
