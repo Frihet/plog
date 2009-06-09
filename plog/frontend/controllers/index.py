@@ -40,7 +40,8 @@ class IndexController(phew.controller.Controller):
             req, 'index', 'ajax_logs', search_params)
 
         return phew.result.Result(
-            'index', {'form_search': form_search,
+            'index', {'title': 'plog',
+                      'form_search': form_search,
                       'url_check': url_check,
                       'url_load': url_load}
             )
@@ -78,7 +79,7 @@ class IndexController(phew.controller.Controller):
         """
         # FIXME: Implement error handling
         sql_where, sql_params = form_search.get_sql_where()
-        sql_query = """SELECT UNIX_TIMESTAMP(log_time) AS last_modified
+        sql_query = """SELECT UNIX_TIMESTAMP(logs.log_time) AS last_modified
 FROM logs WHERE %s
 ORDER BY logs.log_time DESC LIMIT 1""" % (sql_where, )
 
@@ -90,7 +91,7 @@ ORDER BY logs.log_time DESC LIMIT 1""" % (sql_where, )
         """
         Return logs for search form criteria.
         """
-        # FIXME: Error handling.
+        # FIXME: Error handling, number of entries to load.
         sql_where, sql_params = form_search.get_sql_where()
         sql_query = """SELECT logs.*, hosts.name AS host_name
 FROM logs, hosts WHERE logs.host_id = hosts.id AND %s

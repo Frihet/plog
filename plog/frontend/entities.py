@@ -30,19 +30,19 @@ class SearchFilter(phew.entity.FormEntity):
     # Dict with field information for search filter.
     SEARCH_FIELDS = {
         'environment': phew.entity.FieldInfo(
-            list, u'0', values={'0': u'ALL'}),
+            list, u'0', 'Environment', values={'0': u'ALL'}),
         'host': phew.entity.FieldInfo(
-            list, u'0', values={'0': u'ALL'}),
+            list, u'0', 'Host', values={'0': u'ALL'}),
         # FIXME: Get list from entry module?
         'priority': phew.entity.FieldInfo(
-            list, 0, values={
+            list, u'-1', 'Log level', values={
                 u'-1': u'',
                 u'0': u'EMERG', '1': u'ALERT', '2': u'CRIT',
                 u'3': u'ERR', '4': u'WARNING', '5': u'NOTICE',
                 u'6': u'INFO', '7': u'DEBUG'}),
-        'search': None,
-        'time_start': phew.entity.FieldInfo(time.struct_time),
-        'time_end': phew.entity.FieldInfo(time.struct_time)
+        'search': phew.entity.FieldInfo(unicode, u'', 'Includes'),
+        'time_start': phew.entity.FieldInfo(time.struct_time, None, 'Start'),
+        'time_end': phew.entity.FieldInfo(time.struct_time, None, 'End')
         }
 
     def __init__(self, req):
@@ -52,8 +52,8 @@ class SearchFilter(phew.entity.FormEntity):
         # Set field values before calling parent init making sure
         # attribute access behaves as expected.
         self.environment = None
-        self.host = '0'
-        self.priority = '0'
+        self.host = u'0'
+        self.priority = u'-1'
         self.search = u''
         self.time_start = None
         self.time_end = None
