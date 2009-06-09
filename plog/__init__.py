@@ -13,5 +13,12 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+This is plog, python log application for sending and receiving logs
+over the network and then persisting them in a database.
+
+The main module imports constants and known exceptions.
+"""
+
 from plog.constants import *
 from plog.exceptions import *

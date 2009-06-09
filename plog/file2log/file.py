@@ -13,6 +13,10 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Tail file implementation used to watch files by path.
+"""
+
 import fcntl, os
 
 class File(object):
@@ -20,7 +24,7 @@ class File(object):
     File object containing information about a single file source.
     """
 
-    def __init__(self, name, path, parser, formatter):
+    def __init__(self, name, path, parser):
         """
         Initialize file source.
         """
@@ -30,13 +34,11 @@ class File(object):
         self.path = path
         # Parser for file.
         self.parser = parser
-        # Formatter for parsed data.
-        self.formatter = formatter
 
         # File object, None is not opened.
         self.f_obj = None
         # File descriptor of file, -1 is not opened.
-        self.fd = -1
+        self.fd_num = -1
         # Position in file since last read.
         self.pos = 0
         # Inode file is associated with.
@@ -57,7 +59,7 @@ class File(object):
         if self.f_obj is not None:
             self.f_obj.close()
             self.f_obj = None
-        self.fd = -1
+        self.fd_num = -1
         self.pos = 0
         self.inode = 0
         self.size = -1
@@ -73,14 +75,14 @@ class File(object):
             return False
 
         # Open file and seek to end
-        self.fd = self.f_obj.fileno()
+        self.fd_num = self.f_obj.fileno()
         if seek_end:
             self.f_obj.seek(0, 2)
         self.pos = self.f_obj.tell()
 
         # Set non-blocking mode
-        flags = fcntl.fcntl(self.fd, fcntl.F_GETFL)
-        fcntl.fcntl(self.fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+        flags = fcntl.fcntl(self.fd_num, fcntl.F_GETFL)
+        fcntl.fcntl(self.fd_num, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
     def reopen(self):
         """

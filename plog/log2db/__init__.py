@@ -14,3 +14,7 @@
 #
 
 
+"""
+Implementation of the log2db application reading syslog messages,
+parsing the log data and persists them in a database.
+"""

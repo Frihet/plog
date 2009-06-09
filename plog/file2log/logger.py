@@ -13,6 +13,11 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Log output wrapper, sends log entries to setup logger.
+"""
+
+import errno, socket
 import plog.file2log.syslog
 
 class Logger(object):

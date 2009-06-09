@@ -17,7 +17,7 @@
 Log data abstraction, encoding and decoding.
 """
 
-import time
+import logging, time
 import plog, plog.file2log.syslog
 
 # Log levels
@@ -120,6 +120,8 @@ class Entry(object):
         try:
             timestamp = time.strptime(timestamp_str, plog.LOG_TIME_FORMAT)
         except ValueError:
+            logging.info('failed to parse timestamp %s, falling back to now'
+                         % (timestamp_str, ))
             timestamp = time.localtime()
         return timestamp
 

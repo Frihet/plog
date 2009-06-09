@@ -13,8 +13,80 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Application server log file parsing for glassfish, tomcat etc.
+"""
+
 import re, cStringIO
 import plog.entry, plog.file_parsers
+
+class GlassfishParser(plog.file_parsers.Parser):
+    """
+    Parser for Glassfish log files.
+    """
+
+    # Field number specifications
+    FIELD_DATE = 1
+    FIELD_LEVEL = 2
+    FIELD_TEXT = 4
+    FIELD_TEXT_EXTRA = 6
+
+    def __init__(self, options):
+        """
+        Initialize parser state.
+        """
+        plog.file_parsers.Parser.__init__(self, options)
+
+        # Parser flag, in message parsing
+        self.in_message = False
+        # Parser message buffer.
+        self.msg_buf = cStringIO.StringIO()
+
+    def parse_line(self, line):
+        """
+        Parse line, return a an entry or None.
+        """
+        entry = None
+
+        if self.in_message:
+            self.msg_buf.write(line)
+            # Parse log data
+            if line.endswith(']\n'):
+                self.in_message = False
+                entry = self._create_entry(self.msg_buf.getvalue())
+                self.msg_buf = cStringIO.StringIO()
+
+        elif line.startswith('['):
+            if line.endswith(']\n'):
+                # Single line message
+                entry = self._create_entry(line)
+            else:
+                # Multi line message
+                self.in_message = True
+                self.msg_buf = cStringIO.StringIO()
+                self.msg_buf.write(line)
+
+        return entry
+
+    def _create_entry(self, msg):
+        """
+        Create entry for message text.
+        """
+        if not msg:
+            return
+
+        # Get message into fields
+        fields = msg.split('|')
+
+        level = plog.entry.get_level(fields[GlassfishParser.FIELD_LEVEL])
+
+        # FIXME: Parse timestamp 2009-05-15T00:00:00.609+0200
+        timestamp = None
+
+        return plog.entry.FileEntry(
+            fields[GlassfishParser.FIELD_TEXT],
+            fields[GlassfishParser.FIELD_TEXT_EXTRA],
+            timestamp, level)
 
 class TomcatParser(plog.file_parsers.Parser):
     """
@@ -65,14 +137,14 @@ class TomcatParser(plog.file_parsers.Parser):
         if not msg:
             return None
 
-        fields = msg.split('\n', 1)
+        info = msg.split('\n', 1)
 
         # Get text and possibly traceback
-        text = fields[0]
-        if len(fields) > 1 and fields[1]:
-            text_extra = fields[1]
+        msg = info[0]
+        if len(info) > 1 and info[1]:
+            msg_extra = info[1]
         else:
-            text_extra = None
+            msg_extra = None
 
         # Get level, continue parsing "severe" enough
         level_name = TomcatParser.RE_LINE.search(msg).group(1)
@@ -81,5 +153,5 @@ class TomcatParser(plog.file_parsers.Parser):
         # FIXME: Support parsing the timestamp
         timestamp = None
 
-        return plog.entry.FileEntry(text, text_extra, timestamp, level)
+        return plog.entry.Entry(msg, msg_extra, timestamp, level)
 

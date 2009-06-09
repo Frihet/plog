@@ -13,6 +13,10 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Plog configuration parsing.
+"""
+
 import logging, ConfigParser
 import plog
 
@@ -32,16 +36,15 @@ class PlogConfigParser(ConfigParser.SafeConfigParser):
             options = {}
         return options
 
-    def get_options_with_prefix(self, section, prefix):
+    def get_options_with_prefix(self, section, pre):
         """
         Return dictionary with option: value from configuration with
         options starting with prefix having the prefixed stripped.
         """
         options = {}
 
-        for option in filter(lambda o: o.startswith(prefix),
-                             self.options(section)):
-            options[option[len(prefix):]] = self.get(section, option)
+        for option in [o for o in self.options(section) if o.startswith(pre)]:
+            options[option[len(pre):]] = self.get(section, option)
 
         return options
 
@@ -85,8 +88,9 @@ class Config(object):
         try:
             value = self._to_bool(value)
         except ValueError:
-            logging.warning('invalid boolean in configuration %s.%s, setting default %s'
-                            % (section, key, default))
+            logging.warning(
+                'invalid boolean in configuration %s.%s, setting default %s'
+                % (section, key, default))
             value = self._to_bool(value)
 
     def _to_bool(self, value):
@@ -108,8 +112,9 @@ class Config(object):
         try:
             value = int(value)
         except ValueError:
-            logging.warning('invalid integer in configuration %s.%s, setting default %s'
-                            % (section, key, default))
+            logging.warning(
+                'invalid integer in configuration %s.%s, setting default %s'
+                % (section, key, default))
             value = int(default)
         return value
         
@@ -132,12 +137,12 @@ class Config(object):
         """
         Return all files specified in the configuration file.
         """
-        import plog.file_parsers, plog.formatters, plog.file2log.file
+        import plog.file_parsers, plog.file2log.file
 
         files = []
 
-        for section in filter(lambda s: s.startswith('file2log-'),
-                              self.cfg.sections()):
+        sections = [s for s in self.cfg.sections() if s.startswith('file2log-')]
+        for section in sections:
             # Get file options
             name = section[len('file-'):]
             path = self.cfg.get(section, plog.CFG_OPT_PATH)
@@ -150,15 +155,7 @@ class Config(object):
             parser = plog.file_parsers.get_parser(
                 parser_name, parser_options)
 
-            # Setup formatter
-            formatter_name = self.cfg.get(
-                section, plog.CFG_OPT_FORMATTER, plog.DEFAULT_FORMATTER)
-            formatter_options = self.cfg.get_options_with_prefix(
-                section, plog.CFG_OPT_FORMATTER + '-')
-            formatter = plog.formatters.get_formatter(
-                formatter_name, formatter_options)
-
             # Construct and append
-            files.append(plog.file2log.file.File(name, path, parser, formatter))
+            files.append(plog.file2log.file.File(name, path, parser))
             
         return files

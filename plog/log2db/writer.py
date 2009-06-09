@@ -13,6 +13,10 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+log2db writer implementation.
+"""
+
 import threading, logging
 import plog, plog.orm
 

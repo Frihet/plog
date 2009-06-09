@@ -13,6 +13,11 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Daemon implementation adding background execute support for
+Applications.
+"""
+
 import os, logging
 import plog, plog.application, plog.util
 

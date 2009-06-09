@@ -13,10 +13,12 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import cStringIO
+"""
+Log file parsing routines.
+"""
 
-# Dict with instantiated parsers.
-PARSER_INSTANCES = {}
+import cStringIO
+import plog.entry
 
 class Parser(object):
     """
@@ -72,18 +74,32 @@ class Parser(object):
         """
         raise NotImplementedError()
 
+class PlainParser(Parser):
+    """
+    Plain text parser, does nothing but returning one log entry per
+    line of text.
+    """
+
+    def parse_line(self, line):
+        """
+        Parse line, return single log entry.
+        """
+        return plog.entry.Entry(line)
+
 def get_parser(name, options):
     """
     Get parser class from name.
     """
     if name.lower() == 'glassfish':
-        import plog.file_parsers.glassfish
-        return plog.file_parsers.glassfish.GlassfishParser(options)
+        import plog.file_parsers.appserver
+        return plog.file_parsers.appserver.GlassfishParser(options)
     elif name.lower() == 'tomcat':
-        import plog.file_parsers.tomcat
-        return plog.file_parsers.tomcat.TomcatParser(options)
+        import plog.file_parsers.appserver
+        return plog.file_parsers.appserver.TomcatParser(options)
     elif name.lower() == 'plain':
-        import plog.file_parsers.plain
-        return plog.file_parsers.plain.PlainParser(options)
+        return PlainParser(options)
+    elif name.lower() == 'rails':
+        import plog.file_parsers.rails
+        return plog.file_parsers.rails.RailsParser(options)
     else:
         raise ValueError('unknown parser named %s' % (name, ))

@@ -13,3 +13,7 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Implementation of the file2log application reading files, parsing the
+log data and sends them over the network.
+"""

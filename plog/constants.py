@@ -13,6 +13,10 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Plog constants, shared settings between all plog modules.
+"""
+
 # Current version of plog
 VERSION = '0.1.0'
 
@@ -27,8 +31,6 @@ READ_LOG_MAX = 32768
 
 # Default parser type
 DEFAULT_PARSER = 'plain'
-# Default formatter type
-DEFAULT_FORMATTER = 'plain'
 # Default logging facility, 1 is LOG_USER
 DEFAULT_FACILITY = 3
 # Default logging priority, 6 is LOG_INFO
@@ -46,8 +48,6 @@ CFG_OPT_PATH = 'path'
 CFG_OPT_PID_PATH = '/var/run'
 # In config file option for setting parser
 CFG_OPT_PARSER = 'parser'
-# In config file option for setting formatter
-CFG_OPT_FORMATTER = 'formatter'
 # In config file option for setting log level
 CFG_OPT_LOG_LEVEL = 'log_level'
 # Default value for log level option

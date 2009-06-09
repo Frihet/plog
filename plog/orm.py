@@ -13,6 +13,12 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Database connection handling and simple object mappings.
+"""
+
+import sys
+
 # Set to true when database information has been extracted
 DB_INITIALIZED = False
 
@@ -227,7 +233,9 @@ class DBConnection(object):
         """
         for parameter in self._get_required_parameters():
             if parameter not in conn_info or not conn_info[parameter]:
-                raise ValueError('missing or empty parameter %s to get_connection. parameters required are %s' % (parameter, ', '.join(self._get_required_parameters())))
+                raise ValueError(
+                    'missing/empty parameter %s. parameters required are %s'
+                    % (parameter, ', '.join(self._get_required_parameters())))
 
     def _get_required_parameters(self):
         """
@@ -350,22 +358,24 @@ def get_connection(conn_info):
 
     @param conn_info Dictionary with connection information.
     """
-    import plog.orm
-
     assert isinstance(conn_info, dict)
     if 'db_type' not in conn_info or not conn_info['db_type']:
-        raise ValueError('missing db_type parameter in conn_info, currently mysql is supported')
+        raise ValueError(
+            'missing db_type parameter, currently mysql is supported')
 
     # Get database
     if conn_info['db_type'].lower() == 'mysql':
         conn = MySQLDBConnection(conn_info)
     else:
-        raise ValueError('unsupported database type %s, currently mysql is supported' % (conn_info['db_type'], ))
+        raise ValueError(
+            'unsupported database type %s, currently mysql is supported'
+            % (conn_info['db_type'], ))
 
     # Initialize database if not already done.
-    if not plog.orm.DB_INITIALIZED:
+    module = sys.modules[__name__]
+    if not module.DB_INITIALIZED:
         _initialize_db(conn)
-        plog.orm.DB_INITIALIZED = True
+        module.DB_INITIALIZED = True
 
     return conn
 
@@ -374,14 +384,14 @@ def _initialize_db(conn):
     Initialize database object mappings, loop through objects in
     module and initialize classes with DBObject in their inheritance.
     """
-    import plog.orm
+    module = sys.modules[__name__]
 
-    for name in dir(plog.orm):
+    for name in dir(module):
         # Skip protected/private members
         if name.startswith('_') or name == 'DBObject':
             continue
 
-        member = getattr(plog.orm, name)
+        member = getattr(module, name)
         if type(member) is type and issubclass(member, DBObject):
             # If it is a db object, get the table and load information
             # about it.

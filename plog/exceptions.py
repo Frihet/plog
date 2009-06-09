@@ -13,6 +13,11 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Plog exceptions thrown by plog modules all sharing PlogException base
+class.
+"""
+
 class PlogException(Exception):
     """
     Base class for all Plog exceptions.

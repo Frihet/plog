@@ -13,6 +13,11 @@
 # along with plog.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Application implementation, handles configuration parsing and
+executing of applications.
+"""
+
 import logging, os, signal, sys
 import plog, plog.config
 
@@ -165,5 +170,8 @@ class Application(object):
         self._flag_reload = True
 
     def _signal_handle_int(self, signum, frame):
+        """
+        Handle SIGINT, set run flag to false.
+        """
         assert signum == signal.SIGINT
         self._flag_run = False
