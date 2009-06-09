@@ -16,8 +16,6 @@
 
 import sys
 
-# FIXME: Add installation prefix path to sys.path
-
 def main():
     """
     Main routine, just loads and starts file2log main routine.

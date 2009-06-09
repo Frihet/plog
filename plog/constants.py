@@ -61,6 +61,9 @@ CFG_OPT_LOG_PATH_DEFAULT = '/var/log/plog'
 # In config file option for daemonizing
 CFG_OPT_DAEMONIZE = 'daemonize'
 
+# In environment option for configuration file position
+ENV_OPT_CONFIG = 'PLOG_CONFIG'
+
 # Log types, these types need to reflect correct values in the database
 LOG_ENTRY_PLAIN = 0
 LOG_ENTRY_REQUEST = 1

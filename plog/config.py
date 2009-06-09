@@ -17,8 +17,15 @@
 Plog configuration parsing.
 """
 
-import logging, ConfigParser
+import logging, os, ConfigParser
 import plog
+
+def get_path():
+    """
+    Return configuration path, either default path or from environment
+    if set.
+    """
+    return os.environ.get(plog.ENV_OPT_CONFIG, plog.PATH_CONFIG)
 
 class PlogConfigParser(ConfigParser.SafeConfigParser):
     """
@@ -59,7 +66,7 @@ class Config(object):
         constants if not specified.
         """
         if path is None:
-            path = plog.PATH_CONFIG
+            path = get_path()
 
         # Path to configuration file.
         self.path = path
