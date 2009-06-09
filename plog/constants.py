@@ -24,6 +24,8 @@ VERSION = '0.1.0'
 EXIT_USAGE = 1
 # Time in seconds to sleep between stat sweeps in the reader
 READ_INTERVAL = 0.01
+# Time in seconds to sleep between sending log entries.
+SYSLOG_INTERVAL = 0.0001
 # Maximum amount of data to read in a single iteration
 READ_MAX = 8192
 # Maximum log event size
@@ -63,3 +65,16 @@ CFG_OPT_DAEMONIZE = 'daemonize'
 LOG_ENTRY_PLAIN = 0
 LOG_ENTRY_REQUEST = 1
 LOG_ENTRY_APPSERVER = 2
+
+# Log parsing, HTTP codes that should be considered ok.
+HTTP_CODES_OK = (200, 302)
+# Log parsing, HTTP codes that should be considered a warning
+HTTP_CODES_WARNING = (404, )
+
+# Text to display when no URI is logged.
+URI_ERROR = 'ERROR'
+# Text to display when no user agent is logged.
+USER_AGENT_UNKNOWN = 'UNKNOWN'
+
+# Log format representing date/time for log entries
+LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'

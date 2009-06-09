@@ -39,8 +39,6 @@ class File(object):
         self.f_obj = None
         # File descriptor of file, -1 is not opened.
         self.fd_num = -1
-        # Position in file since last read.
-        self.pos = 0
         # Inode file is associated with.
         self.inode = 0
         # Last reported file size.
@@ -60,7 +58,6 @@ class File(object):
             self.f_obj.close()
             self.f_obj = None
         self.fd_num = -1
-        self.pos = 0
         self.inode = 0
         self.size = -1
 
@@ -78,7 +75,6 @@ class File(object):
         self.fd_num = self.f_obj.fileno()
         if seek_end:
             self.f_obj.seek(0, 2)
-        self.pos = self.f_obj.tell()
 
         # Set non-blocking mode
         flags = fcntl.fcntl(self.fd_num, fcntl.F_GETFL)
@@ -113,6 +109,7 @@ class File(object):
                 self.size = stat_res.st_size
                 if self.f_obj is not None:
                     self.f_obj.seek(0)
+            self.size = stat_res.st_size
 
         except IOError:
             # FIXME: File does not exist no access, how to handle?
@@ -127,7 +124,12 @@ class File(object):
         """
         Check if file has data to be read.
         """
-        return self.f_obj is not None
+        if self.f_obj is None:
+            return False
+        elif self.f_obj.tell() < self.size:
+            return True
+        else:
+            return False
 
     def read(self, num):
         """

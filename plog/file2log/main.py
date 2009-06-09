@@ -17,7 +17,7 @@
 file2log main routine.
 """
 
-import cStringIO
+import time, cStringIO
 import plog, plog.config, plog.daemon, plog.file2log.logger
 
 class File2LogDaemon(plog.daemon.Daemon):
@@ -32,39 +32,51 @@ class File2LogDaemon(plog.daemon.Daemon):
         """
         plog.daemon.Daemon.__init__(self, 'file2log')
 
+        # Log writer, used to send logs via syslog
+        self._logger = None
+        # List of file information objects
+        self._files = None
+
     def _daemon_main(self):
         """
         Main routine for the reader, runs a select loop waiting for
         input/errors on the selected files.
         """
-        # FIXME: Files
-
+        # Init and read configuration
         self._logger = plog.file2log.logger.Logger(self._config)
         self._files = self._config.get_log_files()
 
         buf = cStringIO.StringIO()
         poller = self._initialize_read(self._files)
 
+        read_data = False
         while self._do_run():
             # Iterate over files looking for changes, not using poll
             # here as files can change name and thus following path
             # names will not work using the stat approach.
             for f_obj in self._files:
+                # Re-open file if it has been truncated or been replaced.
                 if f_obj.is_changed():
                     f_obj.reopen()
                 if not f_obj.has_data():
                     continue
 
+                # Try to read data, continue if nothing was returned
+                data = f_obj.read(plog.READ_MAX)
+                if not data:
+                    continue
+
                 # Clears out buffer and reads all the new data in.
-                self._read_data(f_obj, buf)
+                read_data = True
+                self._add_data(buf, data)
 
                 # Parse, format and send to logger
-                self._logger.log(
-                    map(lambda e: f_obj.formatter.format(f_obj, e),
-                        f_obj.parser.feed(buf.getvalue())))
+                self._logger.log(f_obj.name, f_obj.parser.feed(buf.getvalue()))
 
             # Wait and do another round
-            time.sleep(plog.READ_INTERVAL)
+            if not read_data:
+                time.sleep(plog.READ_INTERVAL)
+            read_data = False
 
     def _initialize_read(self, files):
         """
@@ -72,7 +84,7 @@ class File2LogDaemon(plog.daemon.Daemon):
         """
         # FIXME: Implement Reader._initialize_read
 
-    def _read_data(self, f_obj, buf):
+    def _add_data(self, buf, data):
         """
         Read to end of file appending data read to buf.
         """
@@ -81,7 +93,7 @@ class File2LogDaemon(plog.daemon.Daemon):
         buf.truncate()
 
         # Read data up until READ_MAX and return 
-        buf.write(f_obj.read(plog.READ_MAX))
+        buf.write(data)
 
 def main():
     """

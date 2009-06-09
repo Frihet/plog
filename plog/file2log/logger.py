@@ -17,7 +17,7 @@
 Log output wrapper, sends log entries to setup logger.
 """
 
-import errno, socket
+import errno, socket, time
 import plog.file2log.syslog
 
 class Logger(object):
@@ -45,6 +45,7 @@ class Logger(object):
         for entry in entries:
             msg = entry.to_syslog(name)
             self._log_until_size_ok(entry.facility, entry.level, msg)
+            time.sleep(plog.SYSLOG_INTERVAL)
 
     def _log_until_size_ok(self, facility, priority, msg):
         """

@@ -56,9 +56,13 @@ class Parser(object):
         # Read buffer line by line, remember last position entry was
         # successfully parsed at.
         for line in self.buf:
-            entry = self.parse_line(line)
-            if entry is not None:
-                entries.append(entry)
+            try:
+                entry = self.parse_line(line)
+                if entry is not None:
+                    entries.append(entry)
+            except:
+                # FIXME: Add parser name here
+                logging.debug('failed parsing line: %s' % (line, ))
 
         # Truncate buffer.
         self.buf.reset()
