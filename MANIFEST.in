@@ -1,0 +1,4 @@
+include data/plog.cfg
+include data/sql/*.sql
+include data/init/file2log
+include data/init/log2db

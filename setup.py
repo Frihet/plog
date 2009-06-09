@@ -27,5 +27,6 @@ setup(name='plog', version=plog.VERSION,
                 'plog.frontend', 'plog.log2db'],
       scripts=['scripts/file2log', 'scripts/log2db'],
       data_files=[('sql', ['data/sql/mysql_init.sql']),
+                  ('/etc', ['data/plog.cfg'),
                   ('/etc/init.d', ['data/init/file2log', 'data/init/log2db'])],
       )
