@@ -1,0 +1,3 @@
+Python application logging package, consists of both a system log
+server that parses system log data and log file to system log
+converter.

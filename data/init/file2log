@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# file2log        Starts file2log daemon.
+#
+# chkconfig: - 85 15
+# description: file2log "tails" files, parses the log data and sends them \
+#              over the network to a syslog server.
+# processname: file2log
+# config: /etc/plog.conf
+# pidfile: /var/run/file2log.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+RETVAL=0
+
+start() {
+	[ -x /usr/bin/file2log ] || exit 5
+
+ 	echo -n $"Starting file2log: "
+        /usr/bin/file2log
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/file2log
+	return $RETVAL
+}	
+stop() {
+	echo -n $"Shutting down file2log: "
+	killproc file2log
+	echo
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/file2log
+	return $RETVAL
+}
+restart() {
+	stop
+	start
+}	
+reload()  {
+    RETVAL=1
+    file2log="$(cat /var/run/file2log.pid 2>/dev/null)"
+    echo -n "Reloading file2log..."
+    if [ -n "${file2log}" ] && [ -e /proc/"${file2log}" ]; then
+	kill -HUP "${file2log}";
+	RETVAL=$?
+    fi
+    if [ $RETVAL -ne 0 ]; then
+	failure
+    else
+	success
+    fi
+    echo
+    return $RETVAL
+}
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+  	restart
+	;;
+  reload)
+	reload
+	;;
+  condrestart)
+  	[ -f /var/lock/subsys/file2log ] && restart || :
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|restart|condrestart}"
+	exit 2
+esac
+
+exit $?
+

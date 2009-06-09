@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# log2db        Starts log2db daemon.
+#
+# chkconfig: - 85 15
+# description: log2db listens for syslog messages from the network, parses \
+#              the log data and persists it in a database.
+# processname: log2db
+# config: /etc/plog.conf
+# pidfile: /var/run/log2db.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+RETVAL=0
+
+start() {
+	[ -x /usr/bin/log2db ] || exit 5
+
+ 	echo -n $"Starting log2db: "
+        /usr/bin/log2db
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/log2db
+	return $RETVAL
+}	
+stop() {
+	echo -n $"Shutting down log2db: "
+	killproc log2db
+	echo
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/log2db
+	return $RETVAL
+}
+restart() {
+	stop
+	start
+}	
+reload()  {
+    RETVAL=1
+    log2db="$(cat /var/run/log2db.pid 2>/dev/null)"
+    echo -n "Reloading log2db..."
+    if [ -n "${log2db}" ] && [ -e /proc/"${log2db}" ]; then
+	kill -HUP "${log2db}";
+	RETVAL=$?
+    fi
+    if [ $RETVAL -ne 0 ]; then
+	failure
+    else
+	success
+    fi
+    echo
+    return $RETVAL
+}
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+  	restart
+	;;
+  reload)
+	reload
+	;;
+  condrestart)
+  	[ -f /var/lock/subsys/log2db ] && restart || :
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|restart|condrestart}"
+	exit 2
+esac
+
+exit $?
+
