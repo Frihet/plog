@@ -12,13 +12,12 @@ ${tag_form('index', 'index', None, 'POST', dict((('class', 'search_form'), )))}
   ${form_search.input_field('priority', True)}
   ${form_search.input_field('time_start', True)}
   ${form_search.input_field('time_end', True)}
-
   ${tag_form_submit('Update filter')}
+  ${form_search.input_field('refresh', True)}
 ${tag_form_end()}
 
-<script>
+<script type="text/javascript">
 // Initial state for the logs updating, used and overriden in plog_update_logs
-do_update=true;
 last_modified=0;
 url="${url_check}"
 url_load="${url_load}"

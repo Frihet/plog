@@ -95,7 +95,7 @@ class DBObject(object):
         return row is not None
 
     @classmethod
-    def find_all(cls, conn, conditions):
+    def find_all(cls, conn, conditions, order_by=None, limit_offset=None):
         """
         Find all DBObjects matching condition returning a list.
         """
@@ -108,6 +108,11 @@ class DBObject(object):
                 cls.get_table_name(), conditions_sql)
         else:
             query = """SELECT * FROM %s""" % (cls.get_table_name(), )
+
+        if order_by is not None:
+            query += " ORDER BY %s" % (order_by, )
+        if limit_offset is not None:
+            query += " LIMIT %d, OFFSET %d" % (limit_offset[0], limit_offset[1])
 
         # Fetch results and set
         rows = conn.fetch_all(query, conditions_params)

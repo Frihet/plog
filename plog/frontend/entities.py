@@ -30,18 +30,20 @@ class SearchFilter(phew.entity.FormEntity):
     # Dict with field information for search filter.
     SEARCH_FIELDS = {
         'environment': phew.entity.FieldInfo(
-            list, u'0', 'Environment', values={'0': u'ALL'}),
+            list, u'0', 'Environment', values=[(u'0', u'ALL')]),
         'host': phew.entity.FieldInfo(
-            list, u'0', 'Host', values={'0': u'ALL'}),
+            list, u'0', 'Host', values=[(u'0', u'ALL')]),
         'source': phew.entity.FieldInfo(
-            list, u'0', 'Source', values={'0': u'ALL'}),
+            list, u'0', 'Source', values=[(u'0', u'ALL')]),
         # FIXME: Get list from entry module?
         'priority': phew.entity.FieldInfo(
-            list, u'-1', 'Log level', values={
-                u'-1': u'',
-                u'0': u'EMERG', '1': u'ALERT', '2': u'CRIT',
-                u'3': u'ERR', '4': u'WARNING', '5': u'NOTICE',
-                u'6': u'INFO', '7': u'DEBUG'}),
+            list, u'-1', 'Log level', values=[
+                (u'-1', u''),
+                (u'0', u'EMERG'), (u'1', u'ALERT'), (u'2', u'CRIT'),
+                (u'3', u'ERR'), (u'4', u'WARNING'), (u'5', u'NOTICE'),
+                (u'6', u'INFO'), (u'7', u'DEBUG')]),
+        'refresh': phew.entity.FieldInfo(
+            bool, False, 'Follow logs'),
         'search': phew.entity.FieldInfo(unicode, u'', 'Includes'),
         'time_start': phew.entity.FieldInfo(
             time.struct_time, time.localtime(), 'Start'),
@@ -58,6 +60,7 @@ class SearchFilter(phew.entity.FormEntity):
         self.environment = None
         self.host = u'0'
         self.priority = u'-1'
+        self.refresh = False
         self.search = u''
         self.time_start = None
         self.time_end = None
@@ -65,14 +68,16 @@ class SearchFilter(phew.entity.FormEntity):
         # Try to lookup hosts if not done already (empty list).
         host_values = SearchFilter.SEARCH_FIELDS['host'].list_values
         if  len(host_values) == 1:
-            for host in plog.orm.Host.find_all(req.container.db, {}):
-                host_values[unicode(host.id)] = host.name
+            for host in plog.orm.Host.find_all(
+                req.container.db, {}, 'name'):
+                host_values.append((unicode(host.id), host.name))
 
         # Try to lookup source if not done already (empty list).
         source_values = SearchFilter.SEARCH_FIELDS['source'].list_values
         if  len(source_values) == 1:
-            for source in plog.orm.Source.find_all(req.container.db, {}):
-                source_values[unicode(source.id)] = source.name
+            for source in plog.orm.Source.find_all(
+                req.container.db, {}, 'name'):
+                source_values.append((unicode(source.id), source.name))
 
         # Attributes set, call parent
         phew.entity.FormEntity.__init__(self, 'search', req)

@@ -5,6 +5,8 @@
 function plog_update_logs() {
   $.getJSON(url,
     function (result) {
+      do_update = $('[name=search-refresh]').attr('checked');
+
       if (result.last_modified > last_modified) {
         last_modified = result.last_modified;
 
@@ -13,11 +15,11 @@ function plog_update_logs() {
         $('#logs').load(url_load, {},
           function () {
             if (do_update) {
-              window.setTimeout(plog_update_logs, 5000);
+              window.setTimeout(plog_update_logs, 3000);
             }
           });
       } else if (do_update) {
-        window.setTimeout(plog_update_logs, 5000);
+        window.setTimeout(plog_update_logs, 3000);
       }
     }
   );
