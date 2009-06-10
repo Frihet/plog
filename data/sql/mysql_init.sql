@@ -22,13 +22,20 @@ CREATE TABLE host_types (
        PRIMARY KEY(id)
 );
 
--- Table holding log source information
+-- Table holding log host source information
 CREATE TABLE hosts (
        id INTEGER NOT NULL AUTO_INCREMENT,
        ip VARCHAR(15) NOT NULL, -- IP address of the host
        name VARCHAR(255) NOT NULL, -- User visible name
        environment_id INTEGER REFERENCES environments(id),
        host_type_id INTEGER REFERENCES host_types(id),
+       PRIMARY KEY(id)
+);
+
+-- Table holding log source information
+CREATE TABLE log_sources (
+       id INTEGER NOT NULL AUTO_INCREMENT,
+       name VARCHAR(255) NOT NULL, -- User visible name
        PRIMARY KEY(id)
 );
 
@@ -54,6 +61,7 @@ CREATE TABLE logs (
        msg TEXT,
        msg_extra TEXT,
        log_type INTEGER REFERENCES log_types(id),
+       source_id INTEGER REFERENCES log_sources(id),
        host_id INTEGER REFERENCES hosts(id),
        re_ip VARCHAR(15), -- Columns used by request entries
        re_method VARCHAR(16),

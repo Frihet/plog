@@ -18,16 +18,29 @@ log_info
 </%def>
 
 <%def name="plog_log_plain(log)">
-<tr>
+<tr class="${plog_log_level(log)}">
   <td>${log['log_time']}</td>
   <td>${log['host_name']}</td>
   <td>${log['msg']}</td>
 </tr>
 </%def>
 
+<%def name="plog_header_appserver()">
+<table>
+  <tr>
+    <th>time</th>
+    <th>host</th>
+    <th>source</th>    
+    <th>message</th>
+  </tr>
+</%def>
+
 <%def name="plog_log_appserver(log)">
 <tr class="${plog_log_level(log)}">
-  <td colspan="3"></td>
+  <td>${log['log_time']}</td>
+  <td>${log['host_name']}</td>
+  <td>${log['log_source_name']}</td>
+  <td>${log['msg']}</td>
 </tr>
 </%def>
 
@@ -36,6 +49,7 @@ log_info
   <tr>
     <th>time</th>
     <th>host</th>
+    <td>source</td>
     <th>client</th>
     <th>user agent</th>
     <th>method</th>
@@ -50,6 +64,7 @@ log_info
 <tr class="${plog_log_level(log)}">
   <td>${log['log_time']}</td>
   <td>${log['host_name']}</td>
+  <td>${log['log_source_name']}</td>
   <td>${log['re_ip']}</td>
   <td>${log['re_user_agent']}</td>
   <td>${log['re_method']}</td>

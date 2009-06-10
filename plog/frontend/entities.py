@@ -33,6 +33,8 @@ class SearchFilter(phew.entity.FormEntity):
             list, u'0', 'Environment', values={'0': u'ALL'}),
         'host': phew.entity.FieldInfo(
             list, u'0', 'Host', values={'0': u'ALL'}),
+        'source': phew.entity.FieldInfo(
+            list, u'0', 'Source', values={'0': u'ALL'}),
         # FIXME: Get list from entry module?
         'priority': phew.entity.FieldInfo(
             list, u'-1', 'Log level', values={
@@ -63,6 +65,12 @@ class SearchFilter(phew.entity.FormEntity):
         if  len(host_values) == 1:
             for host in plog.orm.Host.find_all(req.container.db, {}):
                 host_values[unicode(host.id)] = host.name
+
+        # Try to lookup source if not done already (empty list).
+        source_values = SearchFilter.SEARCH_FIELDS['source'].list_values
+        if  len(source_values) == 1:
+            for source in plog.orm.Source.find_all(req.container.db, {}):
+                source_values[unicode(source.id)] = source.name
 
         # Attributes set, call parent
         phew.entity.FormEntity.__init__(self, 'search', req)

@@ -93,8 +93,10 @@ ORDER BY logs.log_time DESC LIMIT 1""" % (sql_where, )
         """
         # FIXME: Error handling, number of entries to load.
         sql_where, sql_params = form_search.get_sql_where()
-        sql_query = """SELECT logs.*, hosts.name AS host_name
-FROM logs, hosts WHERE logs.host_id = hosts.id AND %s
+        sql_query = """SELECT logs.*, hosts.name AS host_name,
+  log_sources.name AS log_source_name
+FROM logs, hosts, log_sources
+WHERE logs.host_id = hosts.id AND logs.source_id = log_sources.id AND %s
 ORDER BY logs.log_time DESC LIMIT 25""" % (sql_where, )
 
         return req.container.db.fetch_all(sql_query, sql_params)

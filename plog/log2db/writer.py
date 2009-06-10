@@ -157,12 +157,19 @@ class MySQLDBWriter(DBWriter):
             host.name = entry.ip_addr
             host.save()
 
+        # FIXME: Add source cache
+        source = plog.orm.Source(self._conn, name=entry.name)
+        if source.id is None:
+            source.name = entry.name
+            source.save()
+
         # Main log data
         log_data = {
             'log_type': entry.get_log_type(),
             'log_time': entry._get_timestamp_str(),
             'facility': entry.facility, 'priority': entry.level,
-            'msg': entry.msg, 'msg_extra': entry.msg_extra, 'host_id': host.id
+            'msg': entry.msg, 'msg_extra': entry.msg_extra,
+            'host_id': host.id, 'source_id': source.id
             }
 
         # Add extra data to log entry

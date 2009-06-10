@@ -235,6 +235,18 @@ class HostType(DBObject):
         """
         return 'host_types'
 
+class Source(DBObject):
+    """
+    Type of log source.
+    """
+
+    @classmethod
+    def get_table_name(cls):
+        """
+        Get name of the table.
+        """     
+        return 'log_sources'
+
 class Log(DBObject):
     """
     Single log entry, can be complemented with extra data from other

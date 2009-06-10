@@ -60,8 +60,8 @@ class Entry(object):
     """
 
     def __init__(self, msg, msg_extra=None, timestamp=None,
-                 facility = plog.DEFAULT_FACILITY, level=LEVEL_NONE,
-                 extra_values = None, addr = None):
+                 facility=plog.DEFAULT_FACILITY, level=LEVEL_NONE,
+                 extra_values=None, addr=None, name=None):
         """
         Initialize entry, fill in timestamp if not specified.
         """
@@ -79,9 +79,13 @@ class Entry(object):
         self.extra_values = extra_values
         # IP address of log source
         self.ip_addr = None
+        # Name of log source
+        self.name = name
 
         if addr is not None:
             self.ip_addr = addr[0]
+        if self.extra_values is None:
+            self.extra_values = {}
 
     @classmethod
     def get_log_type(cls):
@@ -173,6 +177,7 @@ class PlogEntry(Entry):
             return False
 
         # Base log data
+        self.name = info[0]
         self.msg = info[num_fields - 2]
         self.msg_extra = info[num_fields - 1]
         self.timestamp = self._get_timestamp_from_str(info[1])

@@ -8,6 +8,7 @@
 ${tag_form('index', 'index', None, 'POST', dict((('class', 'search_form'), )))}
   ${form_search.input_field('search', True)}
   ${form_search.input_field('host', True)}
+  ${form_search.input_field('source', True)}
   ${form_search.input_field('priority', True)}
   ${form_search.input_field('time_start', True)}
   ${form_search.input_field('time_end', True)}
