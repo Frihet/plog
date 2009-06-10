@@ -3,6 +3,12 @@
 
 <%def name="jquery_code()">
   ${phew_jquery_datetime()}
+
+  $('[name=search-refresh]').click(function () {
+    if ($(this).attr('checked')) {
+      plog_update_logs();
+    }
+  });
 </%def>
 
 ${tag_form('index', 'index', None, 'POST', dict((('class', 'search_form'), )))}

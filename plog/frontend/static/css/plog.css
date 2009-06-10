@@ -24,7 +24,16 @@ form.search_form {
 }
 
 #logs table th {
+  padding: 0.25em;
   background-color: #eee;
+}
+
+#logs tr td {
+  padding: 0.25em;
+}
+
+#logs tr.log_entry td {
+  border-top: 1px solid #ccc;
 }
 
 .log_detail {

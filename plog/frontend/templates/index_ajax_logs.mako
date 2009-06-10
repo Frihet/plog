@@ -1,5 +1,14 @@
 <%namespace file="plog.mako" import="*"/>
 
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.log_entry').click(function () {
+      extra_id = '#' + $(this).attr('id') + '_extra';
+      $(extra_id).toggle();
+    });
+  });
+</script>
+
 <% type_id = -1 %>
 
 % for log in logs:
@@ -23,4 +32,3 @@
     ${plog_log_plain(log)}
   % endif
 % endfor
-</table>
