@@ -30,8 +30,8 @@ LEVEL_ERROR = plog.file2log.syslog.LOG_ERR
 # Map from log level string to log level.
 NAME_TO_LEVEL = {
     'FINEST': LEVEL_DEBUG, 'FINE': LEVEL_DEBUG, 'DEBUG': LEVEL_DEBUG,
-    'INFO': LEVEL_INFO, 'WARNING': LEVEL_WARNING, 'ERROR': LEVEL_ERROR,
-    'SEVERE': LEVEL_ERROR, '': LEVEL_NONE
+    'INFO': LEVEL_INFO, 'WARN': LEVEL_WARNING, 'WARNING': LEVEL_WARNING,
+    'ERROR': LEVEL_ERROR, 'SEVERE': LEVEL_ERROR, '': LEVEL_NONE
     }
 
 # Map from log level to string.
@@ -159,7 +159,12 @@ class PlogEntry(Entry):
         Parse plog style log message.
         """
         extra_fields = self.get_extra_fields()
-        num_fields = 5 + len(extra_fields)
+        num_fields = 5
+        if extra_fields:
+            num_fields += len(extra_fields)
+        else:
+            # Add one to get counting right
+            num_fields += 1
 
         # Parse log message
         info = self.msg[5:].split('|', num_fields)
@@ -232,11 +237,3 @@ class AppserverEntry(PlogEntry):
         Return log signature.
         """
         return '!!AS '
-
-    @classmethod
-    def get_extra_fields(cls):
-        """
-        Return list of extra fields used by request type.
-        """
-        return (('as_name', str), ('as_level', str))
-

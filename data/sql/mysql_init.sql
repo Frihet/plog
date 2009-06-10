@@ -62,8 +62,6 @@ CREATE TABLE logs (
        re_status INTEGER ,
        re_ms_time INTEGER DEFAULT 0,
        re_uri VARCHAR(255),
-       as_name VARCHAR(64), -- Columns used by appserver entries
-       as_level VARCHAR(16), -- FIXME: Set to integer value
        FULLTEXT (msg,msg_extra), -- Index log data for searching
        PRIMARY KEY(id)
 );
