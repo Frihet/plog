@@ -58,7 +58,7 @@ class Logger(object):
                 self.syslog.log(msg, facility=facility, priority=priority)
                 not_sent = False
             except socket.error, exc:
-                if exc.errno == errno.EMSGSIZE:
+                if exc[0] == errno.EMSGSIZE:
                     msg = msg[:len(msg) / 2]
                 else:
                     raise

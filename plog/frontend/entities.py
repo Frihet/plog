@@ -43,8 +43,10 @@ class SearchFilter(phew.entity.FormEntity):
                 u'3': u'ERR', '4': u'WARNING', '5': u'NOTICE',
                 u'6': u'INFO', '7': u'DEBUG'}),
         'search': phew.entity.FieldInfo(unicode, u'', 'Includes'),
-        'time_start': phew.entity.FieldInfo(time.struct_time, None, 'Start'),
-        'time_end': phew.entity.FieldInfo(time.struct_time, None, 'End')
+        'time_start': phew.entity.FieldInfo(
+            time.struct_time, time.localtime(), 'Start'),
+        'time_end': phew.entity.FieldInfo(
+            time.struct_time, time.localtime(time.time() + 86400), 'End')
         }
 
     def __init__(self, req):
@@ -101,7 +103,8 @@ class SearchFilter(phew.entity.FormEntity):
             query_params.append(priority_id)
 
         if self.search:
-            query_parts.append('logs.msg LIKE %s')
+            query_parts.append("""MATCH(logs.msg, logs.msg_extra)
+AGAINST (%s IN BOOLEAN MODE)""")
             query_params.append(self.search)
 
         return (' AND '.join(query_parts), query_params)

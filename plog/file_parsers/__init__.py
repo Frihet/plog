@@ -17,7 +17,7 @@
 Log file parsing routines.
 """
 
-import cStringIO
+import logging, cStringIO
 import plog.entry
 
 class Parser(object):
