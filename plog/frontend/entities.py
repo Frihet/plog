@@ -39,9 +39,11 @@ class SearchFilter(phew.entity.FormEntity):
         'priority': phew.entity.FieldInfo(
             list, u'-1', 'Log level', values=[
                 (u'-1', u''),
-                (u'0', u'EMERG'), (u'1', u'ALERT'), (u'2', u'CRIT'),
-                (u'3', u'ERR'), (u'4', u'WARNING'), (u'5', u'NOTICE'),
-                (u'6', u'INFO'), (u'7', u'DEBUG')]),
+                (u'7', u'&gt;= DEBUG'), (u'6', u'&gt;= INFO'),
+                (u'5', u'&gt;= NOTICE'), (u'4', u'&gt;= WARNING'),
+                (u'3', u'&gt;= ERR'),  (u'2', u'&gt;= CRIT'),
+                (u'1', u'&gt;= ALERT'),(u'0', u'= EMERG'),
+                ]),
         'refresh': phew.entity.FieldInfo(
             bool, False, 'Follow logs'),
         'search': phew.entity.FieldInfo(unicode, u'', 'Includes'),
