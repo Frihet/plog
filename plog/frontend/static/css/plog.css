@@ -2,20 +2,80 @@
  * Base styling, body, link tags etc.
  */
 body {
-  font-familiy: sans-serif;
+  font-family: sans-serif;
   color: #000;
   background-color: #fff;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 /*
  * Element styling specific to plog
  */
+#header {
+}
+
+#menu {
+  width: 100%;
+  height: 43px;
+  margin: 0px;
+  padding: 0px;
+  background: #fff url('images/menu-bg.png') top left repeat-x;
+  font-size: 0.8em;
+  font-family: sans-serif;
+  font-weight: bold;
+  list-style-type: none;
+}
+
+#menu li {
+  display: block;
+  float: left;
+  margin: 0 0 0 5px;
+}
+
+#menu li a {
+  height: 43px;
+  color: #777;
+  text-decoration: none;
+  display: block;
+  float: left;
+  line-height: 200%;
+  padding: 8px 15px 0;
+}
+
+#menu li a:hover {
+  color: #333;
+}
+
+#menu li a.current {
+  color: #FFF;
+  background: #FFF url('images/menu-bg-sel.png') top left repeat-x;
+  padding: 5px 15px 0;
+}
+
+#body {
+  margin: 1em;
+}
+
+div.todo {
+  width: 50%;
+  background-color: #faa;
+  border: 1px solid #ccc;
+  padding: 1em;
+  margin: 0.5em auto;
+}
+
 form.search_form {
   background-color: #eee;
   border: 1px solid #ccc;
   padding: 0.5em;
   margin-top: 1em;
   margin-bottom: 1em;
+  text-align: center;
+}
+
+input.search_field {
+  width: 80%;
 }
 
 #logs table {

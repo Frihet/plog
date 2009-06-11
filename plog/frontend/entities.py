@@ -46,7 +46,7 @@ class SearchFilter(phew.entity.FormEntity):
                 ]),
         'refresh': phew.entity.FieldInfo(
             bool, False, 'Follow logs'),
-        'search': phew.entity.FieldInfo(unicode, u'', 'Includes'),
+        'search': phew.entity.FieldInfo(unicode, u'', 'Search'),
         'time_start': phew.entity.FieldInfo(
             time.struct_time, time.localtime(), 'Start'),
         'time_end': phew.entity.FieldInfo(

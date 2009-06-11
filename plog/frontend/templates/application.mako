@@ -15,9 +15,23 @@
   </script>
 </head>
 <body>
-${tag_static_img('plog.png')}
+<div id="header">
+  ${tag_static_img('plog.png')}
 
-${self.body()}
+  <ul id="menu">
+% for controller, name in (('index', 'Search logs'), ('reports', 'Reports'), ('rules', 'Rules'), ('admin', 'Administration')):
+    <li><a href="${container.construct_url(request, controller, 'index')}"
+% if controller == request.request_info['controller']:
+  class="current"
+% endif
+         >${name}</a></li>
+% endfor
+  </ul>
+</div>
+
+<div id="body">
+  ${self.body()}
+</div>
 
 </body>
 </html>
