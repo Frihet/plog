@@ -43,9 +43,7 @@ class DBObject(object):
         init_object = True
 
         # Get key to lookup object from database with
-        if self.get_primary_key() in kwargs:
-            lookup_key = self.get_primary_key()
-        elif len(kwargs) == 1:
+        if len(kwargs) == 1:
             lookup_key = kwargs.keys()[0]
         else:
             lookup_key = None

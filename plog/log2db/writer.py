@@ -138,6 +138,10 @@ class MySQLDBWriter(DBWriter):
         """
         try:
             self._conn = plog.orm.get_connection(self._config.get_db_config())
+            # As this is a long-running daemon, do not give up connecting to
+            # the database.
+            self._conn.retry_attempts = -1
+            self._conn.retry_interval = plog.LOG2DB_RETRY_INTERVAL
         except plog.DBException:
             raise plog.InitializationError()
 

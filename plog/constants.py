@@ -64,6 +64,9 @@ CFG_OPT_DAEMONIZE = 'daemonize'
 # In environment option for configuration file position
 ENV_OPT_CONFIG = 'PLOG_CONFIG'
 
+# log2db database connect retry interval
+LOG2DB_RETRY_INTERVAL = 5.0
+
 # Log types, these types need to reflect correct values in the database
 LOG_ENTRY_PLAIN = 0
 LOG_ENTRY_REQUEST = 1
