@@ -17,7 +17,9 @@
 Database connection handling and simple object mappings.
 """
 
-import sys
+import logging, sys, time
+import MySQLdb
+
 
 # Set to true when database information has been extracted
 DB_INITIALIZED = False
@@ -265,6 +267,66 @@ class Log(DBObject):
         """
         return 'logs'
 
+def try_reconnect(fn):
+    """
+    Reconnect decorator, retries up until retry_attempts on instance or
+    been done. If instance retry_interval is > 0, sleep that long between
+    attempts.
+    """
+
+    # Allowed operational errors, access denied, can't connect, unknown host
+    # and gone away.
+    ALLOWED_CONNECT_ERRORS = (1045, 2003, 2005, 2006)
+
+    def do_retry(*args):
+        """
+        Retry part of decorator, separated out to not slow queries that work
+        ok.
+        """
+        # FIXME: How to get instance object in a sane fashion?
+        obj = getattr(fn, 'im_self', args[0])
+
+        num = 0
+        while obj.retry_attempts == -1 or num < obj.retry_attempts:
+            # If connection failed and more retry attempts exist,
+            # sleep for a while before retrying.
+            if obj.retry_interval > 0:
+                time.sleep(obj.retry_interval)
+
+            # Re-execute query
+            if obj.is_connected():
+                try:
+                    return fn(*args)
+                except MySQLdb.OperationalError, exc:
+                    if exc.args[0] != 2006:
+                        raise
+                    logging.debug('lost connection to server, attempt %d'
+                                  % (num, ))
+
+            # Re-connect if connection is still broken, allow for most 
+            try:
+                obj.connect()
+            except MySQLdb.OperationalError, exc: 
+                if exc.args[0] not in ALLOWED_CONNECT_ERRORS:
+                    raise 
+                logging.debug('failed to reconnect after failure, attempt %d'
+                              % (num, ))
+            num += 1
+        raise # FIXME: Sane exception
+
+    def retry(*args):
+        """
+        Main decorator, try and if it fails send query over to retry handler.
+        """
+        try:
+            return fn(*args)
+        except MySQLdb.OperationalError, exc:
+            if exc.args[0] != 2006:
+                raise
+            do_retry(*args)
+
+    return retry
+
 class DBConnection(object):
     """
     Base class for database connections.
@@ -274,6 +336,15 @@ class DBConnection(object):
         """
         Validate parameters.
         """
+        # How many times should connection to the database re-tried,
+        # -1 is unlimited.
+        self.retry_attempts = -1
+        # How many seconds should be waited until retrying an
+        # connection, <= 0 disabled waiting.
+        self.retry_interval = 0.05
+        # Database connection handle
+        self._conn = None
+
         for parameter in self._get_required_parameters():
             if parameter not in conn_info or not conn_info[parameter]:
                 raise ValueError(
@@ -286,12 +357,38 @@ class DBConnection(object):
         """
         raise NotImplementedError()
 
+    def connect(self, conn_info=None):
+        """
+        Connect to database, if already connected close connection and
+        re-connect.
+        """
+        if self._conn is not None:
+            self._conn = None
+        if conn_info is None:
+            conn_info = self._conn_info
+
+        self._connect(conn_info)
+        self._conn_info = conn_info
+
+    def _connect(self, conn_info):
+        """
+        Actual DB connection method, implemented by subclasses.
+        """
+        raise NotImplementedError()
+
+    def is_connected(self):
+        """
+        Return True if database is connected, not validated.
+        """
+        return self._conn is not None
+
     def get_cursor(self):
         """
         Get cursor for database connection, implemented by sub classes.
         """
         raise NotImplementedError()
 
+    @try_reconnect
     def execute(self, query, query_params):
         """
         Execute query not returning results.
@@ -303,6 +400,7 @@ class DBConnection(object):
             res = curs.execute(query)
         curs.close()
 
+    @try_reconnect
     def fetch_one(self, query, query_params):
         """
         Convenience functionality to fetch to grab a cursor, execute a
@@ -318,6 +416,7 @@ class DBConnection(object):
 
         return row
 
+    @try_reconnect
     def fetch_all(self, query, query_params):
         """
         Convenience functionality to fetch all results for a
@@ -349,13 +448,7 @@ class MySQLDBConnection(DBConnection):
         """
         DBConnection.__init__(self, conn_info)
 
-        import MySQLdb
-
-        # MySQL datbase connection handle
-        self._conn = MySQLdb.connect(
-            user=conn_info['username'], passwd=conn_info['password'],
-            host=conn_info['host'], port=conn_info['port'],
-            db=conn_info['db_name'], use_unicode=False) 
+        self.connect(conn_info)
 
     def _get_required_parameters(self):
         """
@@ -363,11 +456,20 @@ class MySQLDBConnection(DBConnection):
         """
         return ('host', 'port', 'username', 'password', 'db_name')
 
+    def _connect(self, conn_info):
+        """
+        Open connection to MySQL and store handle on self.
+        """
+        # MySQL datbase connection handle
+        self._conn = MySQLdb.connect(
+            user=conn_info['username'], passwd=conn_info['password'],
+            host=conn_info['host'], port=conn_info['port'],
+            db=conn_info['db_name'], use_unicode=True) 
+
     def get_cursor(self):
         """
         Return cursor for database connection.
         """
-        import MySQLdb
         return self._conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
     def get_insert_id(self):
