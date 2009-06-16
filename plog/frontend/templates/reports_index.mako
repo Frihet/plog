@@ -1,4 +1,3 @@
-<%namespace file="phew.mako" import="*"/>
 <%inherit file="application.mako"/>
 
 <div class="todo">

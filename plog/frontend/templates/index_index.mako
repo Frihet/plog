@@ -1,8 +1,8 @@
-<%namespace file="phew.mako" import="*"/>
+<%namespace name="phew" module="phew.template"/>
 <%inherit file="application.mako"/>
 
 <%def name="jquery_code()">
-  ${phew_jquery_datetime()}
+  ${phew.phew_jquery_datetime()}
 
   $('[name=search-refresh]').click(function () {
     if ($(this).attr('checked')) {
@@ -11,16 +11,16 @@
   });
 </%def>
 
-${tag_form('index', 'index', None, 'POST', dict((('class', 'search_form'), )))}
+${phew.tag_form('index', 'index', None, 'POST', dict((('class', 'search_form'), )))}
   ${form_search.input_field('search', True, dict((('class', 'search_field'), )))}<br />
   ${form_search.input_field('host', True)}
   ${form_search.input_field('source', True)}
   ${form_search.input_field('priority', True)}
   ${form_search.input_field('time_start', True)}
   ${form_search.input_field('time_end', True)}
-  ${tag_form_submit('Update filter')}
+  ${phew.tag_form_submit('Update filter')}
   ${form_search.input_field('refresh', True)}
-${tag_form_end()}
+${phew.tag_form_end()}
 
 <script type="text/javascript">
 // Initial state for the logs updating, used and overriden in plog_update_logs
