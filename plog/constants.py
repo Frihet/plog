@@ -38,7 +38,7 @@ DEFAULT_FACILITY = 3
 # Default logging priority, 6 is LOG_INFO
 DEFAULT_PRIORITY = 4
 # Default path to configuration file
-PATH_CONFIG = 'plog.cfg'
+PATH_CONFIG = '/etc/plog.cfg'
 
 # In config file option for the logging section
 CFG_SECT_LOGGING = 'logging'

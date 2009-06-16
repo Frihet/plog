@@ -2,3 +2,8 @@ include data/plog.cfg
 include data/sql/*.sql
 include data/init/file2log
 include data/init/log2db
+include plog/frontend/templates/*.mako
+include plog/frontend/static/css/*.css
+include plog/frontend/static/css/images/*.png
+include plog/frontend/static/js/*.js
+include plog/frontend/static/img/*.png
