@@ -99,6 +99,7 @@ class Config(object):
                 'invalid boolean in configuration %s.%s, setting default %s'
                 % (section, key, default))
             value = self._to_bool(value)
+        return value
 
     def _to_bool(self, value):
         """
@@ -110,6 +111,7 @@ class Config(object):
             value = False
         else:
             raise ValueError('invalid boolean value %s' % (value, ))
+        return value
 
     def get_int(self, section, key, default):
         """

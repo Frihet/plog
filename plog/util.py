@@ -35,17 +35,3 @@ def write_file(path, data, append=False):
         return False
 
     return True
-
-def value_to_str(value):
-    """
-    Convert value to string.
-    """
-    if isinstance(value, unicode):
-        value = value.encode('utf-8')
-    elif isinstance(value, int):
-        value = '%d' % (value, )
-    elif isinstance(value, float):
-        value = '%0.2f' % (value, )
-    elif not isinstance(value, str):
-        value = str(value)
-    return value

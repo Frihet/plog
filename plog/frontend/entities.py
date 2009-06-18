@@ -48,9 +48,10 @@ class SearchFilter(phew.entity.FormEntity):
             bool, False, 'Follow logs'),
         'search': phew.entity.FieldInfo(unicode, u'', 'Search'),
         'time_start': phew.entity.FieldInfo(
-            time.struct_time, time.localtime(), 'Start'),
+            time.struct_time, time.localtime(time.time() - 3600), 'Start'),
         'time_end': phew.entity.FieldInfo(
-            time.struct_time, time.localtime(time.time() + 86400), 'End')
+            time.struct_time, time.localtime(time.time() + 3600), 'End'),
+        'last_id': phew.entity.FieldInfo(int, None, None, False)
         }
 
     def __init__(self, req):
@@ -66,6 +67,7 @@ class SearchFilter(phew.entity.FormEntity):
         self.search = u''
         self.time_start = None
         self.time_end = None
+        self.last_id = 0
 
         # Try to lookup hosts if not done already (empty list).
         host_values = SearchFilter.SEARCH_FIELDS['host'].list_values
