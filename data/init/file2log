@@ -20,8 +20,13 @@ start() {
  	echo -n $"Starting file2log: "
         /usr/bin/file2log
 	RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		touch /var/lock/subsys/file2log
+		success
+	else
+		failure
+	fi
 	echo
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/file2log
 	return $RETVAL
 }	
 stop() {

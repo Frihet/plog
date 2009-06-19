@@ -40,6 +40,8 @@ DEFAULT_PRIORITY = 4
 # Default path to configuration file
 PATH_CONFIG = '/etc/plog.cfg'
 
+# Plog main configuration
+CFG_SECT_GLOBAL = 'plog'
 # In config file option for the logging section
 CFG_SECT_LOGGING = 'logging'
 # In config file option for the database section
@@ -60,6 +62,10 @@ CFG_OPT_LOG_PATH = 'path'
 CFG_OPT_LOG_PATH_DEFAULT = '/var/log/plog'
 # In config file option for daemonizing
 CFG_OPT_DAEMONIZE = 'daemonize'
+# User to run as
+CFG_OPT_USER = 'user'
+# Group to run as
+CFG_OPT_GROUP = 'group'
 
 # In environment option for configuration file position
 ENV_OPT_CONFIG = 'PLOG_CONFIG'

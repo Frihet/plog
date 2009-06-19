@@ -42,6 +42,8 @@ class File2LogDaemon(plog.daemon.Daemon):
         Main routine for the reader, runs a select loop waiting for
         input/errors on the selected files.
         """
+        self._drop_privileges()
+
         # Init and read configuration
         self._logger = plog.file2log.logger.Logger(self._config)
         self._files = self._config.get_log_files()

@@ -20,8 +20,13 @@ start() {
  	echo -n $"Starting log2db: "
         /usr/bin/log2db
 	RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		touch /var/lock/subsys/log2db
+		success
+	else
+		failure
+	fi
 	echo
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/log2db
 	return $RETVAL
 }	
 stop() {

@@ -124,7 +124,7 @@ class Application(object):
         signal.signal(signal.SIGINT, self._signal_handle_int)
         signal.signal(signal.SIGHUP, self._signal_handle_hup)
 
-    def _drop_privileges(self, user, group):
+    def _drop_privileges(self, user=None, group=None):
         """
         Set user/group privileges
         """
@@ -132,11 +132,23 @@ class Application(object):
 
         # FIXME: Handle permission exceptions
 
-        user_info = pwd.getpwnam(user)
-        group_info = grp.getgrnam(group)
+        # Set user privileges
+        if user is None:
+            user = self._config.get(
+                plog.CFG_SECT_GLOBAL, plog.CFG_OPT_USER, None)
+            user = self._config.get(self._name, plog.CFG_OPT_USER, user)
+        if user is not None:
+            user_info = pwd.getpwnam(user)
+            os.seteuid(user_info.pw_uid)
 
-        os.seteuid(user_info.pw_uid)
-        os.setegid(group_info.gr_gid)
+        # Set group privileges
+        if group is None:
+            group = self._config.get(
+                plog.CFG_SECT_GLOBAL, plog.CFG_OPT_GROUP, None)
+            group = self._config.get(self._name, plog.CFG_OPT_GROUP, group)
+        if group is not None:
+            group_info = grp.getgrnam(group)
+            os.setegid(group_info.gr_gid)
 
     def stop(self):
         """

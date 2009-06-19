@@ -57,6 +57,9 @@ class Log2DbDaemon(plog.daemon.Daemon):
 
         self._socket.bind((address, port))
 
+        # Drop privileges after binding
+        self._drop_privileges()
+
         # FIXME: Support other database writer types
 
         # Create and start writer
