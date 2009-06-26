@@ -17,6 +17,56 @@
 Plog utility and convenience functionality.
 """
 
+class DictCache(object):
+    """
+    Cache using dictionary for key based storage. Cache has a max size
+    of n elements, adding new elements will remove the least accessed
+    element.
+    """
+
+    def __init__(self, max_size):
+        """
+        Create dict cache caching max max_size elements.
+        """
+        # Dict holding actual elements
+        self._data = {}
+        # Max number of elements.
+        self._max_size = max_size
+
+        # Counter for when elements are not found in cache
+        self._stats_miss = 0
+        # Counter for when elements are found in cache
+        self._stats_hits = 0
+        # Counter for when elements are removed from cache due to size.
+        self._stats_remove = 0
+
+    def get(self, key):
+        """
+        Get element from cache, returns None if it does not exist.
+        """
+        value_count = self._data.get(key, None)
+        if value_count is not None:
+            value = value_count[0]
+            value_count[1] += 1
+            self._stats_hits += 0
+        else:
+            value = None
+            self._stats_miss += 0
+
+        return value
+
+    def set(self, key, value):
+        """
+        Set element in cache.
+        """
+        if len(self._data) > self._max_size:
+            self._stats_remove += 1
+
+            # FIXME: Implement purging of elements.
+
+        self._data[key] = [value, 0]
+
+
 def write_file(path, data, append=False):
     """
     Write data into file at path.

@@ -132,6 +132,11 @@ class MySQLDBWriter(DBWriter):
         # Database connection handle.
         self._conn = None
 
+        # Host cache
+        self._cache_host = plog.util.DictCache(plog.CACHE_MAX_SIZE)
+        # Source cache
+        self._cache_source = plog.util.DictCache(plog.CACHE_MAX_SIZE)
+
     def _initialize_run(self):
         """
         Initialize database connection before accepting events.
@@ -151,21 +156,41 @@ class MySQLDBWriter(DBWriter):
         """
         self._conn = None
 
+    def _get_host(self, ip_addr):
+        """
+        Get host from cache or save to database if not found, should
+        always return a value.
+        """
+        host = self._cache_host.get(ip_addr)
+        if host is None:
+            host = plog.orm.Host(self._conn, ip=ip_addr)
+            if host.id is None:
+                host.name = ip_addr
+                host.save()
+            self._cache_host.set(ip_addr, host)
+        return host
+
+
+    def _get_source(self, name):
+        """
+        Get source from cache or save to database if not found, should
+        always return a value.
+        """
+        source = self._cache_source.get(name)
+        if source is None:
+            source = plog.orm.Source(self._conn, name=name)
+            if source.id is None:
+                source.name = name
+                source.save()
+            self._cache_source.set(name, source)
+        return source
+
     def _write(self, entry):
         """
         Write message to database.
         """
-        # FIXME: Add host cache
-        host = plog.orm.Host(self._conn, ip=entry.ip_addr)
-        if host.id is None:
-            host.name = entry.ip_addr
-            host.save()
-
-        # FIXME: Add source cache
-        source = plog.orm.Source(self._conn, name=entry.name)
-        if source.id is None:
-            source.name = entry.name
-            source.save()
+        host = self._get_host(entry.ip_addr)
+        source = self._get_source(entry.name)
 
         # Main log data
         log_data = {
