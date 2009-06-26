@@ -36,6 +36,8 @@ class DBObject(object):
 
         FIXME: Currently no validation is done on the column names to
                avoid speed-downs, this should be an optional parameter.
+        FIXME: orm_validate_columns, orm_lookup, orm_autosave options
+               should be implemented.
         """
         # Database connection handle
         self._conn = conn
@@ -391,6 +393,8 @@ class DBConnection(object):
         """
         Execute query not returning results.
         """
+        logging.debug('sql-execute: %s | %s' % (query, query_params))
+
         curs = self.get_cursor()
         if query_params:
             res = curs.execute(query, query_params)
@@ -404,6 +408,8 @@ class DBConnection(object):
         Convenience functionality to fetch to grab a cursor, execute a
         query and return a dictionary with the results.
         """
+        logging.debug('sql-fetch_one: %s | %s' % (query, query_params))
+
         curs = self.get_cursor()
         if query_params:
             res = curs.execute(query, query_params)
@@ -420,6 +426,8 @@ class DBConnection(object):
         Convenience functionality to fetch all results for a
         query. Grabs cursor, executes and returns a list of rows.
         """
+        logging.debug('sql-fetch_all: %s | %s' % (query, query_params))
+
         curs = self.get_cursor()
         if query_params:
             res = curs.execute(query, query_params)
