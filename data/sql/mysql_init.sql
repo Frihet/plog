@@ -73,3 +73,6 @@ CREATE TABLE logs (
        FULLTEXT (msg,msg_extra), -- Index log data for searching
        PRIMARY KEY(id)
 );
+
+-- Index for logs
+CREATE INDEX logs_log_time_idx ON logs(log_time);
