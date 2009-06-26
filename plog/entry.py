@@ -172,8 +172,10 @@ class PlogEntry(Entry):
 
         # Parse log message
         info = self.msg[5:].split('|', num_fields)
-        if  num_fields > len(info):
-            # FIXME: Handle invalid message
+        if num_fields > len(info):
+            logging.warning(
+                'unable to parse message %s, got %d fields expected max %d'
+                % (self.msg, num_fields, info))
             return False
 
         # Base log data
