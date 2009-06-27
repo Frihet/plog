@@ -55,13 +55,13 @@ class GlassfishParser(plog.file_parsers.Parser):
         if self.in_message:
             self.msg_buf.write(line)
             # Parse log data
-            if line.endswith(']\n'):
+            if line == '|#]\n':
                 self.in_message = False
                 entry = self._create_entry(self.msg_buf.getvalue())
                 self.msg_buf = cStringIO.StringIO()
 
-        elif line.startswith('['):
-            if line.endswith(']\n'):
+        elif line.startswith('[#|'):
+            if line.endswith('|#]\n'):
                 # Single line message
                 entry = self._create_entry(line)
             else:
