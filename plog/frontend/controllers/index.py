@@ -32,34 +32,44 @@ class IndexController(phew.controller.Controller):
 
         # Construct search parameters from search form.
         search_params = form_search.params_all()
+        search_params_ajax = search_params + \
+            [(form_search._get_input_name('page'), form_search.page)]
 
         # Construct URLs used for retrieving logs
-        url_check = req.container.construct_url(
-            req, 'index', 'json_last_modified', search_params)
-        url_load = req.container.construct_url(
-            req, 'index', 'ajax_logs', search_params)
+        url_json = req.container.construct_url(
+            req, 'index', 'json_logs', search_params)
+        url_ajax = req.container.construct_url(
+            req, 'index', 'ajax_logs', search_params_ajax)
 
         return phew.result.Result(
             'index', {'title': 'plog',
                       'form_search': form_search,
-                      'url_check': url_check,
-                      'url_load': url_load}
+                      'url_json': url_json,
+                      'url_ajax': url_ajax}
             )
 
-    def action_json_last_modified(self, req):
+    def action_json_logs(self, req):
         """
         Perform search with with supplied criteria return a simple
         JSON object with last_modified attribute set to unix
         timestamp of the last log message.
         """
+        logs = []
         form_search = plog.frontend.entities.SearchFilter(req)
         if form_search.validate_all():
-            last_modified = self.get_last_modified(req, form_search)
-        else:
-            last_modified = 0
+            logs = self.get_logs(
+                req, form_search, 'logs.log_time DESC, logs.id ASC')
+            if logs:
+                last_id = logs[-1]['id']
+                last_modified = logs[-1]['log_time_unix']
+
+        if not logs:
+            last_id = last_modified = 0
 
         return phew.result.Result(
-            'json_last_modified', {'last_modified': last_modified})
+            'json_logs', {'last_id': last_id,
+                          'last_modified': last_modified,
+                          'logs': logs})
 
     def action_ajax_logs(self, req):
         """
@@ -69,34 +79,48 @@ class IndexController(phew.controller.Controller):
         if form_search.validate_all():
             logs = self.get_logs(req, form_search)
         else:
-            logs = []            
+            logs = []
 
-        return phew.result.Result('ajax_logs', {'logs': logs})
+        form_search.count = self.get_logs_count(req, form_search)
 
-    def get_last_modified(self, req, form_search):
-        """
-        Return last modified for search form criteria.
-        """
-        # FIXME: Implement error handling
-        sql_where, sql_params = form_search.get_sql_where()
-        sql_query = """SELECT UNIX_TIMESTAMP(logs.log_time) AS last_modified
-FROM logs WHERE %s
-ORDER BY logs.log_time DESC LIMIT 1""" % (sql_where, )
+        return phew.result.Result(
+            'ajax_logs', {'form_search': form_search,
+                          'logs': logs
+                          })
 
-        row = req.container.db.fetch_one(sql_query, sql_params)
-
-        return row and row['last_modified'] or 0
-
-    def get_logs(self, req, form_search):
+    def get_logs(self, req, form_search,
+                 sql_order_by='logs.log_time DESC, logs.id DESC'):
         """
         Return logs for search form criteria.
         """
-        # FIXME: Error handling, number of entries to load.
         sql_where, sql_params = form_search.get_sql_where()
-        sql_query = """SELECT logs.*, hosts.name AS host_name,
+        if form_search.refresh:
+            sql_limit_offset = "LIMIT %s"
+            sql_params.append(plog.ORM_MAX_LOAD)
+        else:
+            # Only add limit / offset when in non tailing mode.
+            sql_limit_offset = "LIMIT %s OFFSET %s"
+            sql_params.extend((form_search.epp,
+                               (form_search.page - 1) * form_search.epp))
+
+        # Assemble query
+        sql_query = """SELECT logs.*, 
+  UNIX_TIMESTAMP(logs.log_time) AS log_time_unix,
+  hosts.name AS host_name,
   log_sources.name AS log_source_name
 FROM logs, hosts, log_sources
 WHERE logs.host_id = hosts.id AND logs.source_id = log_sources.id AND %s
-ORDER BY logs.log_time DESC LIMIT 25""" % (sql_where, )
+ORDER BY %s %s""" % (sql_where, sql_order_by, sql_limit_offset)
 
+        # FIXME: Error handling, number of entries to load.
         return req.container.db.fetch_all(sql_query, sql_params)
+
+    def get_logs_count(self, req, form_search):
+        """
+        Return number of matching log entries for criteria.
+        """
+        # FIXME: Error handling
+        sql_where, sql_params = form_search.get_sql_where()
+        sql_query = 'SELECT COUNT(*) AS count FROM logs WHERE %s' % (
+            sql_where, )
+        return req.container.db.fetch_one(sql_query, sql_params)['count']

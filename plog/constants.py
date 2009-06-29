@@ -75,6 +75,9 @@ LOG2DB_RETRY_INTERVAL = 5.0
 # Cache size
 CACHE_MAX_SIZE = 512
 
+# Maximum entries to load at once
+ORM_MAX_LOAD = 128
+
 # Log types, these types need to reflect correct values in the database
 LOG_ENTRY_PLAIN = 0
 LOG_ENTRY_REQUEST = 1

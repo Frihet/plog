@@ -1,0 +1,15 @@
+div.phew_pagination {
+  text-align: center;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+span.phew_pagination_prev a, span.phew_pagination_next a {
+  color: #fff;
+  background-color: #0070b2;
+  border: 1px solid #ddd;
+  display: inline-block;
+  height: 1.5em;
+  width: 1.5em;
+  padding: 0.1em;
+}

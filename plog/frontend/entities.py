@@ -22,7 +22,7 @@ import time
 import phew.entity
 import plog.orm
 
-class SearchFilter(phew.entity.FormEntity):
+class SearchFilter(phew.entity.PagingEntity):
     """
     Entity for handling search forms, filtering and searching.
     """
@@ -84,7 +84,7 @@ class SearchFilter(phew.entity.FormEntity):
                 source_values.append((unicode(source.id), source.name))
 
         # Attributes set, call parent
-        phew.entity.FormEntity.__init__(self, 'search', req)
+        phew.entity.PagingEntity.__init__(self, 'search', req)
 
     def get_fields(self):
         """
@@ -93,19 +93,46 @@ class SearchFilter(phew.entity.FormEntity):
         """
         return SearchFilter.SEARCH_FIELDS        
 
+    def get_base_url(self):
+        """
+        Get base URL for requests to entity.
+        """
+        return self.req.container.construct_url(
+            self.req, 'index', 'index', self.params_all())
+
+    def get_count(self):
+        """
+        Return number of entries for current filter settings.
+        """
+        return self.count
+
     def get_sql_where(self):
         """
         Return (sql, parameters) tuple for filtering in the database
         on specified parameters.
         """
-        query_parts = ['logs.log_time >= %s', 'logs.log_time <= %s']
-        query_params = [phew.util.value_to_str(self.time_start),
-                        phew.util.value_to_str(self.time_end)]
+        # FIXME: Start using user settings for interval here instead of 3600
+
+        if self.refresh:
+            query_parts = ['logs.log_time >= %s']
+            query_params = [phew.util.value_to_str(time.localtime(time.time() - 3600))]
+        else:
+            query_parts = ['logs.log_time >= %s', 'logs.log_time <= %s']
+            query_params = [phew.util.value_to_str(self.time_start),
+                            phew.util.value_to_str(self.time_end)]
+
+        if self.last_id > 0:
+            query_parts.append('logs.id > %s')
+            query_params.append(self.last_id)
 
         host_id = int(self.host)
         if host_id > 0:
             query_parts.append('logs.host_id = %s')
             query_params.append(host_id)
+        source_id = int(self.source)
+        if source_id > 0:
+            query_parts.append('logs.source_id = %s')
+            query_params.append(source_id)
         priority_id = int(self.priority)
         if priority_id > -1:
             query_parts.append('logs.priority <= %s')

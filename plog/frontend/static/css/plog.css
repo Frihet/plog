@@ -9,6 +9,10 @@ body {
   margin-right: 0px;
 }
 
+a, a:visited {
+  color: #00f;
+}
+
 /*
  * Element styling specific to plog
  */
@@ -62,7 +66,7 @@ body {
 }
 
 #body {
-  margin: 1em;
+  padding: 1em;
 }
 
 div.todo {
@@ -86,18 +90,17 @@ input.search_field {
   width: 80%;
 }
 
-#logs table {
+#logs {
   font-size: small;
   border: 1px solid #ccc;
   width: 100%;
 }
 
-#logs table th {
+#logs div {
   padding: 0.25em;
-  background-color: #eee;
 }
 
-#logs tr td {
+#logs div span {
   padding: 0.25em;
 }
 
