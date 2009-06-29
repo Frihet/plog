@@ -60,7 +60,7 @@ CREATE TABLE logs (
        priority INTEGER NOT NULL DEFAULT 0,
        msg TEXT,
        msg_extra TEXT,
-       log_type INTEGER REFERENCES log_types(id),
+       log_type_id INTEGER REFERENCES log_types(id),
        source_id INTEGER REFERENCES log_sources(id),
        host_id INTEGER REFERENCES hosts(id),
        re_ip VARCHAR(15), -- Columns used by request entries

@@ -194,7 +194,7 @@ class MySQLDBWriter(DBWriter):
 
         # Main log data
         log_data = {
-            'log_type': entry.get_log_type(),
+            'log_type_id': entry.get_log_type(),
             'log_time': entry._get_timestamp_str(),
             'facility': entry.facility, 'priority': entry.level,
             'msg': entry.msg, 'msg_extra': entry.msg_extra,
