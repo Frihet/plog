@@ -132,15 +132,6 @@ class Application(object):
 
         # FIXME: Handle permission exceptions
 
-        # Set user privileges
-        if user is None:
-            user = self._config.get(
-                plog.CFG_SECT_GLOBAL, plog.CFG_OPT_USER, None)
-            user = self._config.get(self._name, plog.CFG_OPT_USER, user)
-        if user is not None:
-            user_info = pwd.getpwnam(user)
-            os.seteuid(user_info.pw_uid)
-
         # Set group privileges
         if group is None:
             group = self._config.get(
@@ -149,6 +140,15 @@ class Application(object):
         if group is not None:
             group_info = grp.getgrnam(group)
             os.setegid(group_info.gr_gid)
+
+        # Set user privileges
+        if user is None:
+            user = self._config.get(
+                plog.CFG_SECT_GLOBAL, plog.CFG_OPT_USER, None)
+            user = self._config.get(self._name, plog.CFG_OPT_USER, user)
+        if user is not None:
+            user_info = pwd.getpwnam(user)
+            os.seteuid(user_info.pw_uid)
 
     def stop(self):
         """

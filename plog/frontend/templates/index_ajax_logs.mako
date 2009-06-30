@@ -19,7 +19,9 @@
     log = $('#logs_start + div');
     if (log.length) {
       last_id = log.attr('id').replace('log', '');
-      url_json = url_json.replace(/last_id=[0-9]+/, 'last_id=' + last_id);
+      if (last_id.match(/^[0-9]+$/)) {
+        url_json = url_json.replace(/last_id=[0-9]+/, 'last_id=' + last_id);
+      }
     }
   });
 </script>
