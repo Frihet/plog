@@ -24,6 +24,7 @@
 
 ${phew.tag_form('index', 'index', None, 'POST', dict((('class', 'search_form'), )))}
   ${form_search.input_field('search', True, dict((('class', 'search_field'), )))}<br />
+  ${form_search.input_field('environment', True)}
   ${form_search.input_field('host', True)}
   ${form_search.input_field('source', True)}
   ${form_search.input_field('priority', True)}

@@ -93,7 +93,7 @@ class IndexController(phew.controller.Controller):
         """
         Return logs for search form criteria.
         """
-        sql_where, sql_params = form_search.get_sql_where()
+        sql_where, sql_params = form_search.get_sql_where(req)
         if form_search.refresh:
             sql_limit_offset = "LIMIT %s"
             sql_params.append(plog.ORM_MAX_LOAD)
@@ -120,7 +120,8 @@ ORDER BY %s %s""" % (sql_where, sql_order_by, sql_limit_offset)
         Return number of matching log entries for criteria.
         """
         # FIXME: Error handling
-        sql_where, sql_params = form_search.get_sql_where()
-        sql_query = 'SELECT COUNT(*) AS count FROM logs WHERE %s' % (
-            sql_where, )
+        sql_where, sql_params = form_search.get_sql_where(req)
+        sql_query = """SELECT COUNT(*) AS count
+FROM logs, hosts
+WHERE logs.host_id = hosts.id AND %s""" % (sql_where, )
         return req.container.db.fetch_one(sql_query, sql_params)['count']

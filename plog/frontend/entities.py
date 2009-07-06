@@ -60,7 +60,7 @@ class SearchFilter(phew.entity.PagingEntity):
         """
         # Set field values before calling parent init making sure
         # attribute access behaves as expected.
-        self.environment = None
+        self.environment = u'0'
         self.host = u'0'
         self.priority = u'-1'
         self.refresh = False
@@ -69,16 +69,23 @@ class SearchFilter(phew.entity.PagingEntity):
         self.time_end = None
         self.last_id = 0
 
+        # Try to lookup environments if not done already
+        env_values = SearchFilter.SEARCH_FIELDS['environment'].list_values
+        if len(env_values) == 1:
+            for env in plog.orm.Environment.find_all(
+                req.container.db, {}, 'name'):
+                env_values.append((unicode(env.id), env.name))
+
         # Try to lookup hosts if not done already (empty list).
         host_values = SearchFilter.SEARCH_FIELDS['host'].list_values
-        if  len(host_values) == 1:
+        if len(host_values) == 1:
             for host in plog.orm.Host.find_all(
                 req.container.db, {}, 'name'):
                 host_values.append((unicode(host.id), host.name))
 
         # Try to lookup source if not done already (empty list).
         source_values = SearchFilter.SEARCH_FIELDS['source'].list_values
-        if  len(source_values) == 1:
+        if len(source_values) == 1:
             for source in plog.orm.Source.find_all(
                 req.container.db, {}, 'name'):
                 source_values.append((unicode(source.id), source.name))
@@ -106,7 +113,7 @@ class SearchFilter(phew.entity.PagingEntity):
         """
         return self.count
 
-    def get_sql_where(self):
+    def get_sql_where(self, req):
         """
         Return (sql, parameters) tuple for filtering in the database
         on specified parameters.
@@ -124,6 +131,11 @@ class SearchFilter(phew.entity.PagingEntity):
         if self.last_id > 0:
             query_parts.append('logs.id > %s')
             query_params.append(self.last_id)
+
+        environment_id = int(self.environment)
+        if environment_id > 0:
+            query_parts.append('hosts.environment_id = %s')
+            query_params.append(environment_id)
 
         host_id = int(self.host)
         if host_id > 0:
