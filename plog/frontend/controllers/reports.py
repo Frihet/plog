@@ -17,8 +17,7 @@
 Reports controller, generating log reports.
 """
 
-import time, phew.controller
-import plog.orm, plog.frontend.entities
+import phew.controller
 
 class ReportsController(phew.controller.Controller):
     def action_index(self, req):

@@ -17,8 +17,10 @@
 Log data abstraction, encoding and decoding.
 """
 
-import logging, time
-import plog, plog.file2log.syslog
+import logging
+import time
+import plog
+import plog.file2log.syslog
 
 # Log levels
 LEVEL_NONE = plog.file2log.syslog.LOG_INFO

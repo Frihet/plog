@@ -17,9 +17,10 @@
 Database connection handling and simple object mappings.
 """
 
-import logging, sys, time
+import logging
+import sys
+import time
 import MySQLdb
-
 
 # Set to true when database information has been extracted
 DB_INITIALIZED = False
@@ -400,6 +401,9 @@ class DBConnection(object):
             res = curs.execute(query, query_params)
         else:
             res = curs.execute(query)
+
+        # FIXME: Handle result, what if something goes wrong?!
+
         curs.close()
 
     @try_reconnect
@@ -415,6 +419,9 @@ class DBConnection(object):
             res = curs.execute(query, query_params)
         else:
             res = curs.execute(query)
+
+        # FIXME: Handle result, what if something goes wrong?!
+
         row = curs.fetchone()
         curs.close()
 
@@ -433,6 +440,8 @@ class DBConnection(object):
             res = curs.execute(query, query_params)
         else:
             res = curs.execute(query)
+
+        # FIXME: Handle result, what if something goes wrong?!
 
         rows = []
         row = curs.fetchone()
@@ -490,6 +499,7 @@ class MySQLDBConnection(DBConnection):
         """
         curs = self.get_cursor()
         res = curs.execute("""SELECT * FROM %s LIMIT 1""" % (table_name, ))
+        # FIXME: Handle result, what if something goes wrong?!
         columns = dict((col[0], col[1]) for col in curs.description)
         curs.close()
 

@@ -17,7 +17,9 @@
 Log output wrapper, sends log entries to setup logger.
 """
 
-import errno, socket, time
+import errno
+import socket
+import time
 import plog.file2log.syslog
 
 class Logger(object):
@@ -34,9 +36,9 @@ class Logger(object):
         port = int(config.get('file2log', 'syslog_port', '541'))
 
         if host.lower() in ('localhost', '127.0.0.1') and port == 541:
-            self.syslog = plog.file2log.syslog.syslog_client()
+            self.syslog = plog.file2log.syslog.SyslogClient()
         else:
-            self.syslog = plog.file2log.syslog.syslog_client((host, port))
+            self.syslog = plog.file2log.syslog.SyslogClient((host, port))
 
     def log(self, name, entries):
         """

@@ -18,8 +18,9 @@ Main controller for plog performing display and searching in the log
 data.
 """
 
-import time, phew.controller
-import plog.orm, plog.frontend.entities
+import phew.controller
+import plog.orm
+import plog.frontend.entities
 
 class IndexController(phew.controller.Controller):
     def action_index(self, req):
@@ -28,6 +29,7 @@ class IndexController(phew.controller.Controller):
         """
         form_search = plog.frontend.entities.SearchFilter(req)
         if not form_search.validate_all():
+            # FIXME: Give some constructive feedback
             return
 
         # Construct search parameters from search form.

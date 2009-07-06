@@ -18,8 +18,12 @@ Application implementation, handles configuration parsing and
 executing of applications.
 """
 
-import logging, os, signal, sys
-import plog, plog.config
+import logging
+import os
+import signal
+import sys
+import plog
+import plog.config
 
 class Application(object):
     """
@@ -128,8 +132,6 @@ class Application(object):
         """
         Set user/group privileges
         """
-        import grp, pwd
-
         # FIXME: Handle permission exceptions
 
         # Set group privileges
@@ -138,6 +140,7 @@ class Application(object):
                 plog.CFG_SECT_GLOBAL, plog.CFG_OPT_GROUP, None)
             group = self._config.get(self._name, plog.CFG_OPT_GROUP, group)
         if group is not None:
+            import grp
             group_info = grp.getgrnam(group)
             os.setegid(group_info.gr_gid)
 
@@ -147,6 +150,7 @@ class Application(object):
                 plog.CFG_SECT_GLOBAL, plog.CFG_OPT_USER, None)
             user = self._config.get(self._name, plog.CFG_OPT_USER, user)
         if user is not None:
+            import pwd
             user_info = pwd.getpwnam(user)
             os.seteuid(user_info.pw_uid)
 

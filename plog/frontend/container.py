@@ -19,7 +19,8 @@ configuration to standard phew containers.
 """
 
 import phew.container
-import plog.config, plog.orm
+import plog.config
+import plog.orm
 
 class ContainerCGI(phew.container.ContainerCGI):
     """

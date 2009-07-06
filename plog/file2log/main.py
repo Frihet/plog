@@ -17,8 +17,12 @@
 file2log main routine.
 """
 
-import time, cStringIO
-import plog, plog.config, plog.daemon, plog.file2log.logger
+import time
+import cStringIO
+import plog
+import plog.config
+import plog.daemon
+import plog.file2log.logger
 
 class File2LogDaemon(plog.daemon.Daemon):
     """

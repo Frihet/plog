@@ -18,8 +18,12 @@ System log to database writer module, includes the Log2DbDaemon
 application.
 """
 
-import socket, re
-import plog, plog.daemon, plog.entry, plog.log2db.writer
+import socket
+import re
+import plog
+import plog.daemon
+import plog.entry
+import plog.log2db.writer
 
 # Rules identifying log message
 CLASSIFY_RULES = (

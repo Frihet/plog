@@ -18,8 +18,11 @@ Daemon implementation adding background execute support for
 Applications.
 """
 
-import os, logging
-import plog, plog.application, plog.util
+import os
+import logging
+import plog
+import plog.application
+import plog.util
 
 class Daemon(plog.application.Application):
     """

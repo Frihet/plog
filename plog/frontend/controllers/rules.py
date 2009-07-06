@@ -17,7 +17,7 @@
 Watch rules controller, management of log inspection rules.
 """
 
-import time, phew.controller
+import phew.controller
 
 class RulesController(phew.controller.Controller):
     def action_index(self, req):

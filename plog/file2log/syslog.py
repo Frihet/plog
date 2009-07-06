@@ -28,11 +28,11 @@ local unix-domain socket, or via the TCP service.
 Usually "/dev/log" is the unix domain socket.  This may be different
 for other systems.
 
->>> my_client = syslog_client ('/dev/log')
+>>> my_client = SyslogClient ('/dev/log')
 
 Otherwise, just use the UDP version, port 514.
 
->>> my_client = syslog_client (('my_log_host', 514))
+>>> my_client = SyslogClient (('my_log_host', 514))
 
 On win32, you will have to use the UDP version.  Note that
 you can use this to log to other hosts (and indeed, multiple
@@ -43,9 +43,9 @@ This module is not a drop-in replacement for the python
 
 Usage:
 
->>> c = syslog_client()
->>> c = syslog_client ('/strange/non_standard_log_location')
->>> c = syslog_client (('other_host.com', 514))
+>>> c = SyslogClient()
+>>> c = SyslogClient ('/strange/non_standard_log_location')
+>>> c = SyslogClient (('other_host.com', 514))
 >>> c.log ('testing', facility='local0', priority='debug')
 
 """
@@ -134,7 +134,7 @@ facility_names = {
 
 import socket
 
-class syslog_client(object):
+class SyslogClient(object):
     def __init__ (self, address='/dev/log'):
         self.address = address
         if type (address) == type(''):

@@ -17,8 +17,13 @@
 Application server log file parsing for glassfish, tomcat etc.
 """
 
-import logging, re, time, cStringIO
-import plog, plog.entry, plog.file_parsers
+import logging
+import re
+import time
+import cStringIO
+import plog
+import plog.entry
+import plog.file_parsers
 
 class GlassfishParser(plog.file_parsers.Parser):
     """

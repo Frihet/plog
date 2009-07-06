@@ -17,8 +17,12 @@
 Rails log-file parser.
 """
 
-import re, time, cStringIO
-import plog, plog.entry, plog.file_parsers
+import re
+import time
+import cStringIO
+import plog
+import plog.entry
+import plog.file_parsers
 
 class RailsParser(plog.file_parsers.Parser):
     """

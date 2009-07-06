@@ -17,7 +17,8 @@
 Tail file implementation used to watch files by path.
 """
 
-import fcntl, os
+import fcntl
+import os
 
 class File(object):
     """

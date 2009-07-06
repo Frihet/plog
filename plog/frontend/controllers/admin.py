@@ -18,8 +18,7 @@ Administration controller for plog setting host names, defining host
 groups etc.
 """
 
-import time, phew.controller
-import plog.orm, plog.frontend.entities
+import phew.controller
 
 class AdminController(phew.controller.Controller):
     def action_index(self, req):

@@ -17,7 +17,9 @@
 Plog configuration parsing.
 """
 
-import logging, os, ConfigParser
+import logging
+import os
+import ConfigParser
 import plog
 
 def get_path():
@@ -146,7 +148,8 @@ class Config(object):
         """
         Return all files specified in the configuration file.
         """
-        import plog.file_parsers, plog.file2log.file
+        import plog.file_parsers
+        import plog.file2log.file
 
         files = []
 

@@ -17,8 +17,10 @@
 log2db writer implementation.
 """
 
-import threading, logging
-import plog, plog.orm
+import threading
+import logging
+import plog
+import plog.orm
 
 class Writer(threading.Thread):
     """
