@@ -95,7 +95,10 @@ def get_parser(name, options):
     """
     Get parser class from name.
     """
-    if name.lower() == 'glassfish':
+    if name.lower() == 'apache':
+        import plog.file_parsers.apache
+        return plog.file_parsers.apache.ApacheParser(options)
+    elif name.lower() == 'glassfish':
         import plog.file_parsers.appserver
         return plog.file_parsers.appserver.GlassfishParser(options)
     elif name.lower() == 'tomcat':
