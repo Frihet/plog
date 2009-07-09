@@ -23,7 +23,6 @@ function plog_update_logs() {
 
         plog_insert_logs(result);
         plog_truncate_logs();
-        plog_apply_callbacks();
       }
 
       // Schedule update of logs
@@ -32,6 +31,12 @@ function plog_update_logs() {
       }
     }
   );
+}
+
+// Toggle callback when pressing elements
+function plog_toggle_entry() {
+    var extra_id = '#' + $(this).attr('id') + '_extra';
+    $(extra_id).toggle();
 }
 
 // Insert log entries, first adding both separate log entries and bulk
@@ -49,6 +54,7 @@ function plog_insert_logs(result) {
 
     var j_item = jQuery(item.html);
     j_item.data('log_time', item.log_time);
+    j_item.click(plog_toggle_entry);
 
     entry.before(j_item);
   });
@@ -56,17 +62,10 @@ function plog_insert_logs(result) {
   // After separet entires have been added, add the bulk of log
   // entries that have timestamp > last_modified.
   // $('#logs_start').after(result.log_entries_bulk);
+
 }
 
 // Limit amount of log data entries being displayed
 function plog_truncate_logs() {
   $('#logs div:gt(' + (max_logs + 1) + ')').remove();
-}
-
-// Apply callbacks on new log entries
-function plog_apply_callbacks() {
-  $('.log_entry').click(function(){
-    var extra_id = '#' + $(this).attr('id') + '_extra';
-    $(extra_id).toggle();
-  });
 }
